@@ -45,36 +45,45 @@ classdef PropertyData < handle
         function writeToCSV(this, csvFile)
             N = numel(this.Address);
             fid = fopen(csvFile, 'wt');
-            fieldNames = {'Link', 'Address', 'City', 'ZipCode', 'UseCode', ...
+            fieldNames = {'Address', 'City', 'State', 'ZipCode', 'UseCode', ...
                           'TaxAssessment', 'TaxAssessmentYear', 'YearBuilt', ...
                           'LotSizeSqFt', 'FinishedSqFt', 'Bathrooms', 'Bedrooms', ...
                           'TotalRooms', 'LastSoldDate', 'LastSoldPrice', 'ZEstimate'};
             for idx = 1:numel(fieldNames)
                 fprintf(fid, '%s;', fieldNames{idx});
             end
-            fprintf(fid, 'OccVacant;Status;LBCode;Price;Notes');
+            fprintf(fid, 'OccVacant;Status;LBCode;Price;Notes;Link');
             fprintf(fid, '\n');
 
             % Now write out the data
             for idx = 1:N
-                fprintf('idx = %d\n', idx);
                 item = this.DeepSearchResults{idx};
+                
+                fprintf(fid, '%s;%s;%s;', this.Address{idx}, this.City{idx}, this.State{idx});
+
                 if isempty(item)
                     for fieldId = 1:numel(fieldNames)
                         fprintf(fid, ';');
                     end
                 else
-                    fprintf(fid, '%s;%s;%s;%s;%s;', ...
-                            item.Link, item.Address, item.City, item.ZipCode, item.UseCode);
-                    fprintf(fid, '%d;%d;%d;', item.TaxAssessment, item.TaxAssessmentYear, item.YearBuilt);
-                    fprintf(fid, '%d;%d;', item.LotSizeSqFt, item.FinishedSqFt);
-                    fprintf(fid, '%g;%d;%d;', item.Bathrooms, item.Bedrooms, item.TotalRooms);
+                    fprintf(fid, '%s;%s;', ...
+                            item.ZipCode, item.UseCode);
+                    fprintf(fid, '%g;%g;%g;', item.TaxAssessment, item.TaxAssessmentYear, item.YearBuilt);
+                    fprintf(fid, '%g;%g;', item.LotSizeSqFt, item.FinishedSqFt);
+                    fprintf(fid, '%g;%g;%g;', item.Bathrooms, item.Bedrooms, item.TotalRooms);
                     fprintf(fid, '%s;%d;%d', item.LastSoldDate, item.LastSoldPrice, item.ZEstimate);
                 end
 
                 fprintf(fid, ';%s;%s;%s;%g;%s', ...
                         this.OccVacant{idx}, this.Status{idx}, this.LBCode{idx}, ...
                         this.Price(idx), this.Notes{idx});
+
+                % Write out the last item.
+                if isempty(item)
+                    fprintf(fid, ';');
+                else
+                    fprintf(fid, ';%s', item.Link);
+                end
                 fprintf(fid, '\n');
             end
             fclose(fid);
@@ -142,7 +151,11 @@ classdef PropertyData < handle
         end
         
         function results = parseLBCode(value)
-            results = value;
+            if isnumeric(value)
+                results = num2str(value);
+            else
+                results = value;
+            end
         end
         
         function results = parsePrice(value)
