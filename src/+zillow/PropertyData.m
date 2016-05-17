@@ -8,25 +8,23 @@ classdef PropertyData < handle
         Address = {}
         City = {}
         State = {}
-        OccVacant = {}
-        Status = {}
-        LBCode = {}
-        Price = [];
-        Notes = {};
+        OriginalData = {};
+        InputDataFile
     end
     
     methods (Access = public)
         function this = PropertyData(xlsFile)
             this.import(xlsFile);
+            this.InputDataFile = xlsFile;
             this.crawl;
         end
         
         function crawl(this)
-            query = zillow.DeepSearchResults;
+            query = zillow.DeepSearchResults;                       
             N = numel(this.Address);
             for idx = 1:N
                 fprintf('Address %d: %s\n', idx, this.Address{idx});
-                results = query.exec(this.getAddressQuery(idx)); 
+                results = query.exec(this.Address{idx}, this.City{idx}, this.State{idx}); 
                 if isempty(results)
                     this.BadAddress{end+1} = struct('Address', this.Address{idx}, 'City', ...
                                                     this.City{idx}, 'State', this.State{idx});
@@ -35,10 +33,12 @@ classdef PropertyData < handle
             end
 
             % Display address that we cannot retrive the information.
-            fprintf('===== Cannot retrieve information of below addresses ======\n');
-            for idx = 1:numel(this.BadAddress)
-                item =this.BadAddress{idx};
-                fprintf('%s, %s, %s\n', item.Address, item.City, item.State);
+            if ~isempty(this.BadAddress)
+                fprintf('===== Cannot retrieve information of below addresses ======\n');
+                for idx = 1:numel(this.BadAddress)
+                    item =this.BadAddress{idx};
+                    fprintf('%s, %s, %s\n', item.Address, item.City, item.State);
+                end
             end
         end
 
@@ -53,48 +53,49 @@ classdef PropertyData < handle
         end
 
         function writeToCSV(this, csvFile)
-            N = numel(this.Address);
+            [~, N] = size(this.OriginalData);
+            originalHeaders = this.OriginalData(1,:);
+            zillowHeaders = zillow.DeepSearchResults.Headers;
+            allHeaders = horzcat(zillow.DeepSearchResults.Headers, originalHeaders{3:end});
+
+            % Open a CSV file  to write
             fid = fopen(csvFile, 'wt');
-            fieldNames = {'Address', 'City', 'State', 'ZipCode', 'UseCode', ...
-                          'TaxAssessment', 'TaxAssessmentYear', 'YearBuilt', ...
-                          'LotSizeSqFt', 'FinishedSqFt', 'Bathrooms', 'Bedrooms', ...
-                          'TotalRooms', 'LastSoldDate', 'LastSoldPrice', 'ZEstimate'};
-            for idx = 1:numel(fieldNames)
-                fprintf(fid, '%s;', fieldNames{idx});
+            
+            % Write the header
+            for idx = 1:numel(allHeaders)
+                fprintf(fid, '%s;', allHeaders{idx});                
             end
-            fprintf(fid, 'OccVacant;Status;LBCode;Price;Notes;Link');
             fprintf(fid, '\n');
-
-            % Now write out the data
-            for idx = 1:N
+            
+            % Write data
+            numberOfZillowHeaders = numel(zillowHeaders);
+            for idx = 1:numel(this.DeepSearchResults)
                 item = this.DeepSearchResults{idx};
-                
-                fprintf(fid, '%s;%s;%s;', this.Address{idx}, this.City{idx}, this.State{idx});
-
                 if isempty(item)
-                    for fieldId = 1:numel(fieldNames)
+                    fprintf(fid, ';');  % Zillow link is empty.
+                    for colId = 1:2
+                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
+                    end
+                    
+                    for fieldId = 4:numberOfZillowHeaders
                         fprintf(fid, ';');
                     end
+                                        
+                    for colId = 3:N
+                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
+                    end
+                    
+                    fprintf(fid, '\n');
                 else
-                    fprintf(fid, '%s;%s;', ...
-                            item.ZipCode, item.UseCode);
-                    fprintf(fid, '%g;%g;%g;', item.TaxAssessment, item.TaxAssessmentYear, item.YearBuilt);
-                    fprintf(fid, '%g;%g;', item.LotSizeSqFt, item.FinishedSqFt);
-                    fprintf(fid, '%g;%g;%g;', item.Bathrooms, item.Bedrooms, item.TotalRooms);
-                    fprintf(fid, '%s;%d;%d', item.LastSoldDate, item.LastSoldPrice, item.ZEstimate);
+                    for fieldId = 1:numberOfZillowHeaders
+                        this.writeValue(fid, item.(zillowHeaders{fieldId}));
+                    end
+                    
+                    for colId = 3:N
+                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
+                    end
+                    fprintf(fid, '\n');
                 end
-
-                fprintf(fid, ';%s;%s;%s;%g;%s', ...
-                        this.OccVacant{idx}, this.Status{idx}, this.LBCode{idx}, ...
-                        this.Price(idx), this.Notes{idx});
-
-                % Write out the last item.
-                if isempty(item)
-                    fprintf(fid, ';');
-                else
-                    fprintf(fid, ';%s', item.Link);
-                end
-                fprintf(fid, '\n');
             end
             fclose(fid);
         end
@@ -102,16 +103,12 @@ classdef PropertyData < handle
         function import(this, xlsFile)
             [~, ~, raw] = xlsread(xlsFile);
             [M, N] = size(raw);
-            assert(N == 7, 'We assume that there are only 7 columns\n');
+            assert(N > 1, 'We assume that there are at least 2 columns\n');
             for idx = 2:M
                 this.Address{end + 1} = this.parseAddress(raw{idx, 1});
                 [this.City{end + 1}, this.State{end + 1}] = this.parseCity(raw{idx, 2});
-                this.OccVacant{end + 1} = this.parseOccVacant(raw{idx, 3});
-                this.Status{end + 1} = this.parseStatus(raw{idx, 4});
-                this.LBCode{end + 1} = this.parseLBCode(raw{idx, 5});
-                this.Price(end + 1) = this.parsePrice(raw{idx, 6});
-                this.Notes{end + 1} = this.parseNotes(raw{idx, 7});
             end
+            this.OriginalData = raw;
         end
 
         function print(this, idx)
@@ -124,19 +121,9 @@ classdef PropertyData < handle
                                    this.City{id}, ...
                                    this.State{id}), idx);
         end
-
-        function cmd = getAddressQuery(this, idx)
-            anAddress = this.Address{idx};
-            aCity = this.City{idx};
-            aState = this.State{idx};            
-            cmd = sprintf('&address=%s&citystatezip=%s%s+%s', ...
-                          strrep(strtrim(anAddress), ' ', '+'), ...
-                          strrep(strtrim(aCity), ' ', '+'), '%2C', aState);
-        end
-
     end
     
-    methods (Static, Access = private)
+    methods (Static, Access = public)
         function results = parseAddress(value)
             results = value;
         end
@@ -174,6 +161,18 @@ classdef PropertyData < handle
         
         function results = parseNotes(value)
             results = value;
+        end
+        
+        function writeValue(fid, val)
+            if isempty(val)
+                fprintf(fid, ';');
+            elseif ischar(val)
+                fprintf(fid, '%s;', val);
+            elseif isnumeric(val)
+                fprintf(fid, '%g;', val);
+            else
+                assert(false, 'Unexpected data type: %s\n', class(val));
+            end
         end
     end    
 end
