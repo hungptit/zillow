@@ -42,6 +42,16 @@ classdef PropertyData < handle
             end
         end
 
+        function writeToMarkdown(this, mdFile)
+            fid = fopen(mdFile, 'wt');
+            % Write out the markdown table here.
+            
+            
+
+            % Close the markdown file.
+            fclose(fid);
+        end
+
         function writeToCSV(this, csvFile)
             N = numel(this.Address);
             fid = fopen(csvFile, 'wt');
