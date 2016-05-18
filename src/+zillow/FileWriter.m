@@ -1,7 +1,11 @@
 classdef FileWriter < handle
-    properties (SetAccess = public, GetAccess = public)
+    properties (SetAccess = protected, GetAccess = protected)
         FileId
         SepChar = ';'
+        Headers = {'Link', 'Address', 'City', 'UseCode', ...
+                   'YearBuilt', 'LotSizeSqFt', 'FinishedSqFt', 'Bathrooms', ...
+                   'Bedrooms', 'TotalRooms', 'TaxAssessment', ...
+                   'TaxAssessmentYear', 'LastSoldDate', 'LastSoldPrice', 'ZEstimate'}
     end
     
     methods (Access = public)
@@ -18,8 +22,15 @@ classdef FileWriter < handle
             end
         end
         
-        function write(this, allHeaders, searchResults, originalData, zillowHeaders)
+        function write(this, crawlData)
+            originalHeaders = crawlData.OriginalData(1,:);
+            zillowHeaders = this.Headers;
+            allHeaders = horzcat(this.Headers, originalHeaders{3:end});
+            searchResults = crawlData.DeepSearchResults;
+            originalData = crawlData.OriginalData(2:end, :); % Skip the first row.
             [~, N] = size(originalData);
+
+            % Write the header
             this.writeHeaders(allHeaders);
                         
             % Write out the data
@@ -75,13 +86,20 @@ classdef FileWriter < handle
             if isempty(val)
                 fprintf(this.FileId, '%s', this.SepChar);
             elseif ischar(val)
-                fprintf(this.FileId, '%s%s', val, this.SepChar);
+                if ~isempty(strfind(val, 'http://'))
+                    this.writeHyperLink(val, 'link');
+                else
+                    fprintf(this.FileId, '%s%s', val, this.SepChar);
+                end
             elseif isnumeric(val)
                 fprintf(this.FileId, '%g%s', val, this.SepChar);
             else
                 assert(false, 'Unexpected data type: %s\n', class(val));
             end
         end
+
+        function writeHyperLink(this, aLink, ~)
+            fprintf(this.FileId, '%s%s', aLink, this.SepChar);
+        end
     end
 end
-

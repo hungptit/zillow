@@ -41,65 +41,9 @@ classdef PropertyData < handle
                 end
             end
         end
+    end
 
-        function writeToMarkdown(this, mdFile)
-            fid = fopen(mdFile, 'wt');
-            % Write out the markdown table here.
-            
-            
-
-            % Close the markdown file.
-            fclose(fid);
-        end
-
-        function writeToCSV(this, csvFile)
-            [~, N] = size(this.OriginalData);
-            originalHeaders = this.OriginalData(1,:);
-            zillowHeaders = zillow.DeepSearchResults.Headers;
-            allHeaders = horzcat(zillow.DeepSearchResults.Headers, originalHeaders{3:end});
-
-            % Open a CSV file  to write
-            fid = fopen(csvFile, 'wt');
-            
-            % Write the header
-            for idx = 1:numel(allHeaders)
-                fprintf(fid, '%s;', allHeaders{idx});                
-            end
-            fprintf(fid, '\n');
-            
-            % Write data
-            numberOfZillowHeaders = numel(zillowHeaders);
-            for idx = 1:numel(this.DeepSearchResults)
-                item = this.DeepSearchResults{idx};
-                if isempty(item)
-                    fprintf(fid, ';');  % Zillow link is empty.
-                    for colId = 1:2
-                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
-                    end
-                    
-                    for fieldId = 4:numberOfZillowHeaders
-                        fprintf(fid, ';');
-                    end
-                                        
-                    for colId = 3:N
-                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
-                    end
-                    
-                    fprintf(fid, '\n');
-                else
-                    for fieldId = 1:numberOfZillowHeaders
-                        this.writeValue(fid, item.(zillowHeaders{fieldId}));
-                    end
-                    
-                    for colId = 3:N
-                        this.writeValue(fid, this.OriginalData{idx + 1, colId});
-                    end
-                    fprintf(fid, '\n');
-                end
-            end
-            fclose(fid);
-        end
-
+    methods (Access = private)
         function import(this, xlsFile)
             [~, ~, raw] = xlsread(xlsFile);
             [M, N] = size(raw);
@@ -110,20 +54,9 @@ classdef PropertyData < handle
             end
             this.OriginalData = raw;
         end
-
-        function print(this, idx)
-            if isempty(idx)
-                idx = 1:numel(this.Address);
-            end
-
-            arrayfun(@(id) fprintf('%s; %s; %s\n', ...
-                                   this.Address{id}, ...
-                                   this.City{id}, ...
-                                   this.State{id}), idx);
-        end
     end
     
-    methods (Static, Access = public)
+    methods (Static, Access = private)
         function results = parseAddress(value)
             results = value;
         end
@@ -136,42 +69,6 @@ classdef PropertyData < handle
             else
                 city = value(1:(pos-1));
                 state = value((pos+1):end);
-            end
-        end
-        
-        function results = parseOccVacant(value)
-            results = value;
-        end
-        
-        function results = parseStatus(value)
-            results = value;
-        end
-        
-        function results = parseLBCode(value)
-            if isnumeric(value)
-                results = num2str(value);
-            else
-                results = value;
-            end
-        end
-        
-        function results = parsePrice(value)
-            results = value;
-        end
-        
-        function results = parseNotes(value)
-            results = value;
-        end
-        
-        function writeValue(fid, val)
-            if isempty(val)
-                fprintf(fid, ';');
-            elseif ischar(val)
-                fprintf(fid, '%s;', val);
-            elseif isnumeric(val)
-                fprintf(fid, '%g;', val);
-            else
-                assert(false, 'Unexpected data type: %s\n', class(val));
             end
         end
     end    

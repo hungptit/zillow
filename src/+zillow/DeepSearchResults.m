@@ -5,7 +5,7 @@ classdef DeepSearchResults < handle
     end
     
     properties (Constant)
-        Headers = {'Link', 'Address', 'City', 'State', 'ZipCode', 'Latitude', 'Longitude', 'UseCode', ...
+        Headers = {'zpid', 'Link', 'Street', 'City', 'State', 'ZipCode', 'Latitude', 'Longitude', 'UseCode', ...
                    'YearBuilt', 'LotSizeSqFt', 'FinishedSqFt', 'Bathrooms', 'Bedrooms', 'TotalRooms', ...
                    'TaxAssessment', 'TaxAssessmentYear', 'LastSoldDate', 'LastSoldPrice', 'ZEstimate'};
     end
@@ -27,7 +27,7 @@ classdef DeepSearchResults < handle
 
         function item = parse(this, xmlData)
             fileName = [tempname, '.xml'];
-            this.write(fileName, xmlData);
+            zillow.Utilities.write(fileName, xmlData);
             info = zillow.xml2struct(fileName);
             delete(fileName);
             
@@ -80,8 +80,9 @@ classdef DeepSearchResults < handle
                     end
 
                     item = struct(...
+                        'zpid', str2double(results.zpid.Text), ...
                         'Link', results.links.homedetails.Text, ...
-                        'Address', results.address.street.Text, ...
+                        'Street', results.address.street.Text, ...
                         'City', results.address.city.Text, ...
                         'State', results.address.state.Text, ...
                         'ZipCode', results.address.zipcode.Text, ...
@@ -105,16 +106,5 @@ classdef DeepSearchResults < handle
                 end
             end
         end
-    end
-    
-    methods (Static, Access = public)        
-        function write(fileName, xmlData)
-            fid = fopen(fileName, 'wt');
-            if (fid < 0)
-                error('Could not open "%s" file to write\n', fileName);
-            end
-            fprintf(fid, '%s\n', xmlData);
-            fclose(fid);
-        end
-    end
+    end    
 end
