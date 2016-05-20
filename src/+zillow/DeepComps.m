@@ -11,7 +11,7 @@ classdef DeepComps < handle
             results = this.parse(xmlData);
         end
 
-        function results = parse(this, xmlData)
+        function results = parse(~, xmlData)
             fileName = [tempname, '.xml'];
             zillow.Utilities.write(fileName, xmlData);
             info = zillow.xml2struct(fileName);
@@ -19,28 +19,8 @@ classdef DeepComps < handle
 
             % Create the output
             data = info.Comps_colon_comps.response.properties;
-            results = struct('Prinipal', this.extractData(data.principal), ...
-                             'Comps', cellfun(@(item) this.extractData(item), data.comparables.comp));
-        end
-    end
-
-    methods (Static, Access = public)
-        function results = extractData(item)
-            results = struct('zpid', str2double(item.zpid.Text), ...
-                             'Link', item.links.homedetails.Text, ...
-                             'Street', item.address.street.Text, ...
-                             'City', item.address.city.Text, ...
-                             'State', item.address.state.Text, ...
-                             'ZipCode', item.address.zipcode.Text, ...
-                             'ZEstimate', str2double(item.zestimate.amount.Text));
-        end
-
-        function dispCompResults(results)
-            for idx = 1:numel(results.Comps)
-                item = results.Comps(idx);
-                fprintf('House %d: %s, %s, %s -> zestimate: %d\n', ...
-                        idx, item.Street, item.City, item.State, item.ZEstimate);
-            end
+            results = struct('Prinipal', zillow.Utilities.extractData(data.principal), ...
+                             'Comps', cellfun(@(item) zillow.Utilities.extractData(item), data.comparables.comp));
         end
     end
 end
