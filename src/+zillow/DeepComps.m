@@ -6,7 +6,8 @@ classdef DeepComps < handle
 
     methods (Access = public)
         function results = exec(this, zpid, count)
-            queryCommand = sprintf('%szws-id=%s&zpid=%s&count=%d', this.ZillowWebService, this.ZWSID, zpid, count);
+            queryCommand = sprintf('%szws-id=%s&zpid=%d&count=%d', ...
+                                   this.ZillowWebService, this.ZWSID, zpid, count);            
             xmlData = webread(queryCommand);
             results = this.parse(xmlData);
         end
@@ -19,8 +20,9 @@ classdef DeepComps < handle
 
             % Create the output
             data = info.Comps_colon_comps.response.properties;
-            results = struct('Prinipal', zillow.Utilities.extractData(data.principal), ...
-                             'Comps', cellfun(@(item) zillow.Utilities.extractData(item), data.comparables.comp));
+                results = struct('Principal', zillow.Utilities.extractData(data.principal), ...
+                                 'Comps', cellfun(@(item) ...
+                                                  zillow.Utilities.extractData(item), data.comparables.comp));
         end
     end
 end

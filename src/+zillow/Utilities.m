@@ -1,4 +1,14 @@
 classdef Utilities < handle
+    properties (Constant)
+        DeepSearchResultsHeaders = {...
+            'zpid', 'Link', 'Street', 'City', 'State', ...
+            'ZipCode', 'Latitude', 'Longitude', 'UseCode', ...
+            'YearBuilt', 'LotSizeSqFt', 'FinishedSqFt', ...
+            'Bathrooms', 'Bedrooms', 'TotalRooms', ...            
+            'TaxAssessment', 'TaxAssessmentYear', 'LastSoldDate', ...
+            'LastSoldPrice', 'ZEstimate'}';
+    end
+    
     methods (Static, Access = public)        
         function write(fileName, xmlData)
             fid = fopen(fileName, 'wt');
@@ -15,33 +25,39 @@ classdef Utilities < handle
                 lastSoldPrice = str2double(results.lastSoldPrice.Text);
             else
                 lastSoldDate = '';
-                lastSoldPrice = -1;
+                lastSoldPrice = 0;
             end
             
             if isfield(results, 'totalRooms')
                 totalRooms = str2double(results.totalRooms.Text);
             else
-                totalRooms = -1;
+                totalRooms = 0;
             end
 
             if isfield(results, 'taxAssessment')
                 taxAssessment = str2double(results.taxAssessment.Text);
                 taxAssessmentYear = str2double(results.taxAssessmentYear.Text);
             else
-                taxAssessment = -1;
-                taxAssessmentYear = -1;
+                taxAssessment = 0;
+                taxAssessmentYear = 0;
             end
 
             if isfield(results, 'lotSizeSqFt')
                 lotSizeSqFt = str2double(results.lotSizeSqFt.Text);
             else
-                lotSizeSqFt = -1;
+                lotSizeSqFt = 0;
             end
 
             if isfield(results, 'finishedSqFt')
                 finishedSqFt = str2double(results.finishedSqFt.Text);
             else
-                finishedSqFt =-1;
+                finishedSqFt = 0;
+            end
+            
+            if isfield(results, 'useCode')
+                useCode = results.useCode.Text;
+            else
+                useCode = '';
             end
 
             info = struct(...
@@ -53,7 +69,7 @@ classdef Utilities < handle
                 'ZipCode', results.address.zipcode.Text, ...
                 'Latitude', str2double(results.address.latitude.Text), ...
                 'Longitude', str2double(results.address.longitude.Text), ...
-                'UseCode', results.useCode.Text, ...
+                'UseCode', useCode, ...
                 'YearBuilt', str2double(results.yearBuilt.Text), ...
                 'LotSizeSqFt', lotSizeSqFt, ...
                 'FinishedSqFt', finishedSqFt, ...

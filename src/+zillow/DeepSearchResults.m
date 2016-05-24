@@ -2,13 +2,7 @@ classdef DeepSearchResults < handle
     properties (Access = private, Constant)
         ZillowWebService = 'http://www.zillow.com/webservice/GetDeepSearchResults.htm?';
         ZWSID = 'X1-ZWz1f8wdb88lxn_1y8f9';
-    end
-    
-    properties (Constant)
-        Headers = {'zpid', 'Link', 'Street', 'City', 'State', 'ZipCode', 'Latitude', 'Longitude', 'UseCode', ...
-                   'YearBuilt', 'LotSizeSqFt', 'FinishedSqFt', 'Bathrooms', 'Bedrooms', 'TotalRooms', ...
-                   'TaxAssessment', 'TaxAssessmentYear', 'LastSoldDate', 'LastSoldPrice', 'ZEstimate'};
-    end
+    end    
     
     methods (Access = public)
         function info = exec(this, anAddress, aCity, aState)
@@ -48,7 +42,8 @@ classdef DeepSearchResults < handle
                     item = zillow.Utilities.extractData(results);
                     
                     % Make sure that headers and actual fields are consistent.
-                    assert(isequal(this.Headers', fieldnames(item)), 'Actual and expectec fields are different!');
+                    assert(isequal(zillow.Utilities.DeepSearchResultsHeaders, fieldnames(item)), ...
+                           'Actual and expectec fields are different!');
                 end
             end
         end
