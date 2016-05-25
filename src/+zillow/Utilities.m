@@ -7,7 +7,6 @@ classdef Utilities < handle
             'Bathrooms', 'Bedrooms', 'TotalRooms', ...            
             'TaxAssessment', 'TaxAssessmentYear', 'LastSoldDate', ...
             'LastSoldPrice', 'ZEstimate'}';
-        
     end
     
     methods (Static, Access = public)        

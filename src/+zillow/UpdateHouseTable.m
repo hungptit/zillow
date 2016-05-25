@@ -1,2 +1,0 @@
-classdef UpdateHouseTable < handle
-end
