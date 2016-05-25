@@ -7,6 +7,7 @@ classdef Utilities < handle
             'Bathrooms', 'Bedrooms', 'TotalRooms', ...            
             'TaxAssessment', 'TaxAssessmentYear', 'LastSoldDate', ...
             'LastSoldPrice', 'ZEstimate'}';
+        
     end
     
     methods (Static, Access = public)        
@@ -21,7 +22,9 @@ classdef Utilities < handle
         
         function info = extractData(results)
             if isfield(results, 'lastSoldDate')
-                lastSoldDate = results.lastSoldDate.Text;
+                % Use datenum to make sure that we can save date to
+                % database correctly.
+                lastSoldDate = datenum(results.lastSoldDate.Text);
                 lastSoldPrice = str2double(results.lastSoldPrice.Text);
             else
                 lastSoldDate = '';

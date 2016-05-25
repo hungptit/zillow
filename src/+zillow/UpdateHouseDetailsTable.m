@@ -1,0 +1,3 @@
+classdef UpdateHouseDetailsTable < handle
+    
+end

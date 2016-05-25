@@ -1,0 +1,5 @@
+* TODO Create the database for house and update information.
+* TODO Setup a cron job which will crawls house information daily.
+* TODO Have a C++ client which allow users to add zpid to the database i.e add_house_zpid.
+* TODO A script which can compile the latest version of sqlitebrowser.
+* TODO Web interface which can produce a reasonable report.

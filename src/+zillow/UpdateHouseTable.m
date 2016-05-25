@@ -1,0 +1,2 @@
+classdef UpdateHouseTable < handle
+end
