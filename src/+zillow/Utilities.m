@@ -29,6 +29,19 @@ classdef Utilities < handle
                 lastSoldDate = '';
                 lastSoldPrice = 0;
             end
+
+            if isfield(results, 'bathrooms')
+                bathrooms = str2double(results.bathrooms.Text);
+            else
+                bathrooms = 0;
+            end
+
+            if isfield(results, 'bedrooms')
+                bedrooms = str2double(results.bedrooms.Text);
+            else
+                bedrooms = 0;
+            end
+
             
             if isfield(results, 'totalRooms')
                 totalRooms = str2double(results.totalRooms.Text);
@@ -75,8 +88,8 @@ classdef Utilities < handle
                 'YearBuilt', str2double(results.yearBuilt.Text), ...
                 'LotSizeSqFt', lotSizeSqFt, ...
                 'FinishedSqFt', finishedSqFt, ...
-                'Bathrooms', str2double(results.bathrooms.Text), ...
-                'Bedrooms', str2double(results.bedrooms.Text), ...
+                'Bathrooms', bathrooms, ...
+                'Bedrooms', bedrooms, ...
                 'TotalRooms', totalRooms, ...
                 'TaxAssessment', taxAssessment, ...
                 'TaxAssessmentYear', taxAssessmentYear, ...
@@ -90,6 +103,19 @@ classdef Utilities < handle
                 item = results.Comps(idx);
                 fprintf('House %d: %s, %s, %s -> zestimate: %d\n', ...
                         idx, item.Street, item.City, item.State, item.ZEstimate);
+            end
+        end
+        
+        function results = readAddressFromXLSFile(xlsFile)
+            [~, ~, raw] = xlsread(xlsFile);
+            [M, N] = size(raw);
+            assert(N > 2, 'We assume that there are at least 3 columns which are Street, City, and State.\n');
+            assert(strcmpi(raw{1, 1}, 'street'), 'The first column title must be "Street".');
+            assert(strcmpi(raw{1, 2}, 'city'), 'The first column title must be "City".');
+            assert(strcmpi(raw{1, 3}, 'state'), 'The first column title must be "State".');
+            results = {};
+            for idx = 2:M
+                results{end + 1} = struct('street', raw{idx, 1}, 'city', raw{idx, 2}, 'state', raw{idx, 3}); %#ok
             end
         end
     end
