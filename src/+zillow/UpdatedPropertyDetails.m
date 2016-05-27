@@ -18,12 +18,41 @@ classdef UpdatedPropertyDetails < handle
             delete(fileName);
 
             % Create the output
-            results = this.extractData(info.UpdatedPropertyDetails_colon_updatedPropertyDetails.response);
+            data = info.UpdatedPropertyDetails_colon_updatedPropertyDetails;
+            if isfield(data, 'response')
+                results = this.extractData(data.response);
+            else
+                results = [];
+            end
         end
     end
 
     methods (Static, Access = public)
         function results = extractData(item)
+            if isfield(item, 'homeDescription')
+                desc = item.homeDescription.Text;
+            else
+                desc = '';
+            end
+  
+            if isfield(item, 'editedFacts')
+                data = item.editedFacts;
+                if isfield(data, 'bedrooms')
+                    bedrooms = str2double(data.bedrooms.Text);
+                else
+                    bedrooms = 0;
+                end
+                
+                if isfield(data, 'bedrooms')
+                    bathrooms = str2double(data.bathrooms.Text);
+                else
+                    bathrooms = 0;
+                end
+            else
+                bedrooms = 0;
+                bathrooms = 0;
+            end
+            
             results = struct('zpid', str2double(item.zpid.Text), ...
                              'Link', item.links.homeDetails.Text, ...
                              'Street', item.address.street.Text, ...
@@ -31,13 +60,13 @@ classdef UpdatedPropertyDetails < handle
                              'State', item.address.state.Text, ...
                              'ZipCode', item.address.zipcode.Text, ...
                              'UseCode', item.editedFacts.useCode.Text, ...
-                             'Bedrooms', str2double(item.editedFacts.bedrooms.Text), ...
-                             'Bathrooms', str2double(item.editedFacts.bathrooms.Text), ...
+                             'Bedrooms', bedrooms, ...
+                             'Bathrooms', bathrooms, ...
                              'TotalRooms', str2double(item.editedFacts.numRooms.Text), ...
                              'FinishedSqFt', str2double(item.editedFacts.finishedSqFt.Text), ...
                              'LotSizeSqFt', str2double(item.editedFacts.lotSizeSqFt.Text), ...
                              'YearBuilt', str2double(item.editedFacts.yearBuilt.Text), ...
-                             'HomeDescription', item.homeDescription.Text, ...
+                             'HomeDescription', desc, ...
                              'PageViewCountThisMonth', str2double(item.pageViewCount.currentMonth.Text), ...
                              'PageViewCountTotal', str2double(item.pageViewCount.total.Text));
         end

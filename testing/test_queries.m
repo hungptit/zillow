@@ -11,4 +11,4 @@ deepCompsQuery = zillow.DeepComps;
 comps = deepCompsQuery.exec(zpid, count);
 
 updateQuery = zillow.UpdatedPropertyDetails;
-info = updateQuery.exec(zpid);
+updateInfo = updateQuery.exec(zpid);
