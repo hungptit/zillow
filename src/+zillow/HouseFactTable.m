@@ -118,10 +118,36 @@ classdef HouseFactTable < handle
         
         function createCityTable(this)
             this.DBConnection.exec('BEGIN');
+            
             this.DBConnection.exec('CREATE TABLE  IF NOT EXISTS Cities (ID INTEGER PRIMARY KEY AUTOINCREMENT, SID INTEGER, Name varchar(128))');
-            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'needham');
-            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'springfield');
-            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 2, 'enfield');
+
+            % Massachusetts
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Needham');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'West Springfield');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Springfield');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'East Longmeadow');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Longmeadow');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Chicopee');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Holyoke');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Agawam');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Wilbraham');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Westfield');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'East Otis');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Otis');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Three Rivers');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Three Rivers');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'South Hardley');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Amherst');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Russel');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Ludlow');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Ware');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Indian Orchard');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'West Hampden');
+            
+            % Connecticut
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 2, 'Enfield');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 2, 'Hartford');
+            
             this.DBConnection.exec('COMMIT');
         end
         
