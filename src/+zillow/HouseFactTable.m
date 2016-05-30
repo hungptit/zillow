@@ -1,3 +1,5 @@
+% TODO: Validate the correctness of town and state before crawing
+% the data.
 classdef HouseFactTable < handle   
     properties (SetAccess = private, GetAccess = public)
         DBConnection
@@ -70,12 +72,19 @@ classdef HouseFactTable < handle
             if ~isempty(updateInfo)
                 infoCmd = sprintf('INSERT INTO %s (zpid, taxassessment, taxassessmentyear, lastsolddate, lastsoldprice, zestimate, homedescriptions, pageviewcountthismonth, pageviewcounttotal, querydate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', zillow.Utilities.InfoTableName);
                 this.DBConnection.exec(infoCmd, data.zpid, data.TaxAssessment, data.TaxAssessmentYear, ...
-                                       datenum2sql(data.LastSoldDate), data.LastSoldPrice, data.ZEstimate, ...
-                                       updateInfo.HomeDescription, updateInfo.PageViewCountThisMonth, updateInfo.PageViewCountTotal, datenum2sql(dateNum));
+                                       datestr(data.LastSoldDate, 'yyyy/mm/dd'), data.LastSoldPrice, data.ZEstimate, ...
+                                       updateInfo.HomeDescription, ...
+                                       updateInfo.PageViewCountThisMonth, updateInfo.PageViewCountTotal, ...
+                                       datestr(dateNum, 'yyyy/mm/dd'));
             else
-                infoCmd = sprintf('INSERT INTO %s (zpid, taxassessment, taxassessmentyear, lastsolddate, lastsoldprice, zestimate, querydate) VALUES (?, ?, ?, ?, ?, ?, ?)', zillow.Utilities.InfoTableName);
+                infoCmd = sprintf(['INSERT INTO %s (zpid, taxassessment, ' ...
+                                   'taxassessmentyear, lastsolddate, lastsoldprice, zestimate, querydate) VALUES (?, ?, ?, ?, ?, ?, ?)'], ...
+                                  zillow.Utilities.InfoTableName);
+                
                 this.DBConnection.exec(infoCmd, data.zpid, data.TaxAssessment, data.TaxAssessmentYear, ...
-                                       datenum2sql(data.LastSoldDate), data.LastSoldPrice, data.ZEstimate, datenum2sql(dateNum));
+                                       datestr(data.LastSoldDate, 'yyyy/mm/dd'), ...
+                                       data.LastSoldPrice, data.ZEstimate, ...
+                                       datestr(dateNum, 'yyyy/mm/dd'));                
             end
         end
     end
@@ -136,14 +145,15 @@ classdef HouseFactTable < handle
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Otis');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Three Rivers');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Three Rivers');
-            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'South Hardley');
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'South Hadley');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Amherst');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Russel');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Ludlow');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Ware');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'Indian Orchard');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'West Hampden');
-            
+            this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 1, 'West Brookfield');
+
             % Connecticut
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 2, 'Enfield');
             this.DBConnection.exec('INSERT INTO Cities (SID, Name) VALUES (?, ?)', 2, 'Hartford');
