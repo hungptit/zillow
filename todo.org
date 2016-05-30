@@ -11,3 +11,6 @@
 ** TODO How to draw the area in a flat map?
 * TODO How to import data from Redfin?
 * TODO Save all raw data to leveldb database for later processing i.e missing data fields, changing algorithms or data structures.
+* TODO HouseInfo will have up-to-date information about house. All old + current information will be move to HouseInfoLog table.
+* TODO Use leveldb to store all raw data. We should query data using C++ + Boost ASIO.
+* TODO Need to have a C++ parser for the XML data.
