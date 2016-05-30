@@ -141,6 +141,10 @@ classdef Utilities < handle
                 'LastSoldPrice', lastSoldPrice, ...
                 'ZEstimate', zestimate);
         end
+
+        function createAllHousesView(this)
+            sqlCmd = '';
+        end
         
         function dispCompResults(results)
             for idx = 1:numel(results.Comps)
