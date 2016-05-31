@@ -22,6 +22,7 @@
 #include "Poco/URI.h"
 #include <Poco/Net/HTTPCredentials.h>
 #include <iostream>
+#include <sstream>
 
 using Poco::Net::HTTPClientSession;
 using Poco::Net::HTTPRequest;
@@ -40,7 +41,9 @@ bool doRequest(Poco::Net::HTTPClientSession &session,
     std::cout << response.getStatus() << " " << response.getReason()
               << std::endl;
     if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED) {
-        StreamCopier::copyStream(rs, std::cout);
+        std::stringstream output;
+        StreamCopier::copyStream(rs, output);
+std::cout << "Query results: " << output.str() << "\n";
         return true;
     } else {
         Poco::NullOutputStream null;
@@ -65,20 +68,21 @@ int main(int argc, char **argv) {
         if (path.empty())
             path = "/";
 
-        std::string username;
-        std::string password;
-        Poco::Net::HTTPCredentials::extractCredentials(uri, username, password);
-        Poco::Net::HTTPCredentials credentials(username, password);
+        // std::string username;
+        // std::string password;
+        // Poco::Net::HTTPCredentials::extractCredentials(uri, username, password);
+        // Poco::Net::HTTPCredentials credentials(username, password);
 
         HTTPClientSession session(uri.getHost(), uri.getPort());
         HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
         HTTPResponse response;
         if (!doRequest(session, request, response)) {
-            credentials.authenticate(request, response);
-            if (!doRequest(session, request, response)) {
-                std::cerr << "Invalid username or password" << std::endl;
-                return 1;
-            }
+            // credentials.authenticate(request, response);
+            // if (!doRequest(session, request, response)) {
+            //     std::cerr << "Invalid username or password" << std::endl;
+            //     return 1;
+            // }
+            std::cerr << "Cannot query this link: " << path << "\n";
         }
     } catch (Exception &exc) {
         std::cerr << exc.displayText() << std::endl;

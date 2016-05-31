@@ -12,7 +12,7 @@ classdef DeepSearchResults < handle
             queryCommand = sprintf('%szws-id=%s%s', this.ZillowWebService, this.ZWSID, ...
                                    queryStr);
             
-            % fprintf('%s\n', queryCommand);
+            fprintf('%s\n', queryCommand);
             
             % Query a given address information and parse it into a struct.
             xmlData = webread(queryCommand);
