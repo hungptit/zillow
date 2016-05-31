@@ -23,6 +23,8 @@ classdef DeepComps < handle
                 results = struct('Principal', zillow.Utilities.extractData(data.principal), ...
                                  'Comps', cellfun(@(item) ...
                                                   zillow.Utilities.extractData(item), data.comparables.comp));
-        end
+                
+                
+        end                    
     end
 end

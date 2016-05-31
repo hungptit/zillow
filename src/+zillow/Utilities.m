@@ -166,5 +166,52 @@ classdef Utilities < handle
                 results{end + 1} = struct('street', raw{idx, 1}, 'city', raw{idx, 2}, 'state', raw{idx, 3}); %#ok
             end
         end
+        
+        function writeHouseInfo(fid, fieldNames, data, sepChar)
+            N = numel(fieldNames);
+            for idx = 1:N
+                zillow.Utilities.writeValue(fid, data.(fieldNames{idx}), sepChar);
+            end
+            fprintf(fid, '\n');
+        end                
+        
+        function writeValue(fid, val, sepChar)
+            if isempty(val)
+                fprintf(fid, '%s', sepChar);
+            elseif ischar(val)
+                fprintf(fid, '%s%s', val, sepChar);
+            elseif isnumeric(val)
+                fprintf(fid, '%g%s', val, sepChar);
+            else
+                assert(false, 'Unexpected data type: %s\n', class(val));
+            end
+        end
+        
+        % Write struct information to CSV. 
+        function writeDeepCompResults(similarHouses, dataFile)
+            fieldNames = fieldnames(similarHouses.Principal);
+            N = numel(fieldNames);
+            fid = fopen(dataFile, 'wt');
+            if fid < 0
+                error('Could not open file "%s" to write.\n');
+            end
+            
+            % Write header
+            for idx = 1:N
+                fprintf(fid, '%s,', fieldNames{idx});
+            end
+            fprintf(fid, '\n');
+            
+            % Write principal data
+            zillow.Utilities.writeHouseInfo(fid, fieldNames, similarHouses.Principal, ',');
+            
+            % Write deep comparison data
+            for idx = 1:numel(similarHouses.Comps)
+                zillow.Utilities.writeHouseInfo(fid, fieldNames, similarHouses.Comps(idx), ',');
+            end
+            
+            % Close the output file.
+            fclose(fid);
+        end
     end
 end
