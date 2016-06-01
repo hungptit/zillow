@@ -1,17 +1,3 @@
-//
-// httpget.cpp
-//
-// $Id: //poco/1.4/Net/samples/httpget/src/httpget.cpp#3 $
-//
-// This sample demonstrates the HTTPClientSession and the HTTPCredentials
-// classes.
-//
-// Copyright (c) 2005-2012, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
-
 #include "Poco/Exception.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
@@ -20,9 +6,13 @@
 #include "Poco/Path.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
-#include <Poco/Net/HTTPCredentials.h>
+#include "Poco/Net/HTTPCredentials.h"
+
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
+#include "fmt/format.h"
 
 using Poco::Net::HTTPClientSession;
 using Poco::Net::HTTPRequest;
@@ -33,60 +23,49 @@ using Poco::Path;
 using Poco::URI;
 using Poco::Exception;
 
-bool doRequest(Poco::Net::HTTPClientSession &session,
+enum HTTPStatus {OK = 200, BAD_REQUEST=400};
+
+std::string doRequest(Poco::Net::HTTPClientSession &session,
                Poco::Net::HTTPRequest &request,
                Poco::Net::HTTPResponse &response) {
     session.sendRequest(request);
     std::istream &rs = session.receiveResponse(response);
-    std::cout << response.getStatus() << " " << response.getReason()
-              << std::endl;
-    if (response.getStatus() != Poco::Net::HTTPResponse::HTTP_UNAUTHORIZED) {
-        std::stringstream output;
-        StreamCopier::copyStream(rs, output);
-std::cout << "Query results: " << output.str() << "\n";
-        return true;
+
+    const int status = response.getStatus();
+    if (status == OK) {
     } else {
-        Poco::NullOutputStream null;
-        StreamCopier::copyStream(rs, null);
-        return false;
+      std::cout << status << " " << response.getReason()
+                << std::endl;
     }
+
+    std::stringstream output;
+    if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
+        StreamCopier::copyStream(rs, output);
+    }   
+    
+    return output.str();
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        Path p(argv[0]);
-        std::cout << "usage: " << p.getBaseName() << " <uri>" << std::endl;
-        std::cout << "       fetches the resource identified by <uri> and "
-                     "print it to the standard output"
-                  << std::endl;
-        return 1;
-    }
-
+    std::string aLink("http://www.zillow.com/webservice/"
+                      "GetDeepSearchResults.htm?zws-id=X1-ZWz1f8wdb88lxn_1y8f9&"
+                      "address=302+Warrent+St&citystatezip=Needham%2C+MA");
+    URI uri(aLink);
+    std::string path(uri.getPathAndQuery());
+    
     try {
-        URI uri(argv[1]);
-        std::string path(uri.getPathAndQuery());
-        if (path.empty())
-            path = "/";
-
-        // std::string username;
-        // std::string password;
-        // Poco::Net::HTTPCredentials::extractCredentials(uri, username, password);
-        // Poco::Net::HTTPCredentials credentials(username, password);
-
         HTTPClientSession session(uri.getHost(), uri.getPort());
         HTTPRequest request(HTTPRequest::HTTP_GET, path, HTTPMessage::HTTP_1_1);
         HTTPResponse response;
-        if (!doRequest(session, request, response)) {
-            // credentials.authenticate(request, response);
-            // if (!doRequest(session, request, response)) {
-            //     std::cerr << "Invalid username or password" << std::endl;
-            //     return 1;
-            // }
+        auto results = doRequest(session, request, response);
+        if (results.empty()) {
             std::cerr << "Cannot query this link: " << path << "\n";
         }
+        fmt::print("Output: {}\n", results);
     } catch (Exception &exc) {
         std::cerr << exc.displayText() << std::endl;
         return 1;
     }
+    
     return 0;
 }
