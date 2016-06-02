@@ -60,7 +60,7 @@ set(LIB_SNAPPY "${PROJECTS_FOLDER}/3p/snappy/lib/libsnappy.a")
 if (Boost_FOUND)
   message(${Boost_LIBRARIES})
   include_directories(${BOOST_INCLUDE_DIRS})  
-  set(COMMAND_SRC_FILES zillowCrawler)
+  set(COMMAND_SRC_FILES deepSearchResults deepComps updatedPropertyDetails)
   foreach (src_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${src_file} ${src_file}.cpp)
     TARGET_LINK_LIBRARIES(${src_file}
