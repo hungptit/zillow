@@ -11,13 +11,15 @@
 int main(int argc, char **argv) {
     namespace po = boost::program_options;
     po::options_description desc("Allowed options");
+    
     // clang-format off
     desc.add_options()
-        ("help,h", "This command will query information for a house using zillow DeepSearch API.")
-        ("verbose,v", "Display verbose information.")
-        ("street,a", po::value<std::string>(), "Street")
-        ("city,c", po::value<std::string>(),"City")
-        ("state,s", po::value<std::string>(), "State");
+      ("help,h", "This command will query information for a house using zillow DeepSearch API.")
+      ("verbose,v", "Display verbose information.")
+      ("street,a", po::value<std::string>(), "Street")
+      ("city,c", po::value<std::string>(),"City")
+      ("state,s", po::value<std::string>(), "State")
+      ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
     // clang-format on
 
     po::positional_options_description p;
@@ -61,13 +63,19 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";
+    if (vm.count("zwpid")) {
+        zwpid = vm["zwpid"].as<std::string>();
+    }
+
+    // Replace space by '+' character.
     zillow::strrep(street, ' ', '+');
     zillow::strrep(city, ' ', '+');
 
     fmt::MemoryWriter output;
     output << "http://www.zillow.com/webservice/"
-           << "GetDeepSearchResults.htm?zws-id=X1-ZWz1f8wdb88lxn_1y8f9&"
-           << "address=" << street << "&citystatezip=" << city << "%2C+"
+           << "GetDeepSearchResults.htm?zws-id=" << zwpid
+           << "&address=" << street << "&citystatezip=" << city << "%2C+"
            << state;
 
     if (verbose) {
@@ -76,11 +84,10 @@ int main(int argc, char **argv) {
 
     std::string results = zillow::query(output.str());
     if (results.empty()) {
-      fmt::print("Cannot query this link: {}", output.str());
+        fmt::print("Cannot query this link: {}", output.str());
     } else {
-      fmt::print("Output: {}\n", results);
+        fmt::print("{}\n", results);
     }
-    
 
     return 0;
 }
