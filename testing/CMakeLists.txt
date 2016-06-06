@@ -39,12 +39,13 @@ find_package(Boost 1.60 REQUIRED regex date_time system filesystem thread graph 
 
 # Include folder
 message(${PROJECTS_FOLDER})
-include_directories(${PROJECTS_FOLDER})
-include_directories("${PROJECTS_FOLDER}/3p/gtest/include")
-include_directories("${PROJECTS_FOLDER}/3p/fmt/include")
+include_directories (${PROJECTS_FOLDER})
+include_directories ("${PROJECTS_FOLDER}/3p/gtest/include")
+include_directories ("${PROJECTS_FOLDER}/3p/fmt/include")
 include_directories ("${PROJECTS_FOLDER}/3p/leveldb/include")
 include_directories ("${PROJECTS_FOLDER}/3p/cereal/include")
 include_directories ("${PROJECTS_FOLDER}/3p/sparsehash/include/")
+include_directories ("${PROJECTS_FOLDER}/3p/pugixml/src")
 
 # Use POCO static library
 include_directories("${PROJECTS_FOLDER}/3p/poco/include")
@@ -60,7 +61,7 @@ set(LIB_SNAPPY "${PROJECTS_FOLDER}/3p/snappy/lib/libsnappy.a")
 if (Boost_FOUND)
   message(${Boost_LIBRARIES})
   include_directories(${BOOST_INCLUDE_DIRS})  
-  set(COMMAND_SRC_FILES deepSearchResults deepComps updatedPropertyDetails)
+  set(COMMAND_SRC_FILES deepSearchResults deepComps updatedPropertyDetails tXML)
   foreach (src_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${src_file} ${src_file}.cpp)
     TARGET_LINK_LIBRARIES(${src_file}
