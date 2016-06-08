@@ -4,63 +4,35 @@
 #include <string>
 #include <vector>
 
-class DeepSearchResults {
-  public:
-    DeepSearchResults(pugi::xml_node &info) { traverse(info, info.name()); }
+#include "zillow/XMLParser.hpp"
 
-    void print() const {
-        for (auto const &item : Nodes) {
-            fmt::print("{0} : {1}\n", std::get<0>(item), std::get<1>(item));
-        }
-
-        for (auto const &item : Attributes) {
-            fmt::print(" -> {0} : {1}\n", std::get<0>(item), std::get<1>(item));
-        }
-    }
-
-  private:
-    void traverse(pugi::xml_node &aNode, const std::string &prefix) {
+void parse(pugi::xml_node &aNode, const std::string &prefix) {
+    const std::string rootName = aNode.name();
+    if (!rootName.compare("request")) {
+        auto results = zillow::parseRequest(aNode);
+        fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
+                   std::get<0>(results), std::get<1>(results));
+        return;
+    } else if (!rootName.compare("message")) {
+        auto results = zillow::parseMessage(aNode);
+        fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n",
+                   std::get<0>(results), std::get<1>(results));
+        return;
+    } else if (!rootName.compare("response")) {
+        auto results = zillow::parseResponse(aNode);
+        zillow::print(results);
+        return;
+    } else {
         for (pugi::xml_node aChild = aNode.first_child(); aChild;
              aChild = aChild.next_sibling()) {
             const std::string nodeName = aChild.name();
 
             if (aChild.type() == pugi::node_pcdata) {
-                std::string nodePath = prefix + "/" + nodeName;
-                Nodes.emplace_back(std::make_tuple(nodePath, aChild.value()));
+                // Skip this node
             } else {
-                traverse(aChild, prefix + "/" + nodeName);
+                parse(aChild, prefix + "/" + nodeName);
             }
         }
-
-        // Get attributes for this node.
-        for (pugi::xml_attribute anAttribute = aNode.first_attribute();
-             anAttribute; anAttribute = anAttribute.next_attribute()) {
-            Attributes.emplace_back(std::make_tuple(
-                prefix + "/" + anAttribute.name(), anAttribute.value()));
-        }
-    }
-
-    // Data
-    std::vector<std::tuple<std::string, std::string>> Nodes;
-    std::vector<std::tuple<std::string, std::string>> Attributes;
-};
-
-void dfs(pugi::xml_node aNode, const std::string &prefix) {
-    for (pugi::xml_node aChild = aNode.first_child(); aChild;
-         aChild = aChild.next_sibling()) {
-        const std::string nodeName = aChild.name();
-        if (aChild.type() == pugi::node_pcdata) {
-            std::cout << "Type" << aChild.type() << " "
-                      << prefix + "/ --> " + nodeName << ":" << aChild.value()
-                      << "\n";
-        }
-
-        for (pugi::xml_attribute anAttribute = aNode.first_attribute();
-             anAttribute; anAttribute = anAttribute.next_attribute()) {
-            std::cout << "Attribute -> " << anAttribute.name() << ":"
-                      << anAttribute.value() << "\n";
-        }
-        dfs(aChild, prefix + "/" + nodeName);
     }
 }
 
@@ -81,19 +53,18 @@ int main() {
         pugi::xml_document doc;
         pugi::xml_parse_result parseResults =
             doc.load_file("deepSearchResults.xml");
-        pugi::xml_node info = doc.child("SearchResults:searchresults");
-        DeepSearchResults results(info);
-        results.print();
+        pugi::xml_node root = doc.child("SearchResults:searchresults");
+        parse(root, std::string(""));
     }
 
-    {
-        pugi::xml_document doc;
-        pugi::xml_parse_result parseResults =
-            doc.load_file("deepCompsResults.xml");
-        pugi::xml_node info = doc.child("Comps:comps");
-        DeepSearchResults results(info);
-        results.print();
-    }
+    // {
+    //     pugi::xml_document doc;
+    //     pugi::xml_parse_result parseResults =
+    //         doc.load_file("deepCompsResults.xml");
+    //     pugi::xml_node info = doc.child("Comps:comps");
+    //     DOMSearch results(info);
+    //     results.print();
+    // }
 
     return 0;
 }
