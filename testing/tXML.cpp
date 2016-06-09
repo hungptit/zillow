@@ -4,36 +4,62 @@
 #include <string>
 #include <vector>
 
+#include "zillow/Serialization.hpp"
 #include "zillow/XMLParser.hpp"
 
-void parse(pugi::xml_node &aNode, const std::string &prefix) {
-    const std::string rootName = aNode.name();
-    if (!rootName.compare("request")) {
-        auto results = zillow::parseRequest(aNode);
-        fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
-                   std::get<0>(results), std::get<1>(results));
-        return;
-    } else if (!rootName.compare("message")) {
-        auto results = zillow::parseMessage(aNode);
-        fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n",
-                   std::get<0>(results), std::get<1>(results));
-        return;
-    } else if (!rootName.compare("response")) {
-        auto results = zillow::parseResponse(aNode);
-        zillow::print(results);
-        return;
-    } else {
-        for (pugi::xml_node aChild = aNode.first_child(); aChild;
-             aChild = aChild.next_sibling()) {
-            const std::string nodeName = aChild.name();
+void parseDeepSearchResults() {
+    pugi::xml_document doc;
+    pugi::xml_parse_result parseResults =
+        doc.load_file("deepSearchResults.xml");
 
-            if (aChild.type() == pugi::node_pcdata) {
-                // Skip this node
-            } else {
-                parse(aChild, prefix + "/" + nodeName);
-            }
-        }
+    auto request = zillow::parseDeepSearchResultsRequest(
+        doc.child("SearchResults:searchresults").child("request"));
+    fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
+               std::get<0>(request), std::get<1>(request));
+
+    auto message = zillow::parseMessage(
+        doc.child("SearchResults:searchresults").child("message"));
+    fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
+               std::get<1>(message));
+
+    auto response = zillow::parseDeepSearchResultsResponse(
+        doc.child("SearchResults:searchresults")
+            .child("response")
+            .child("results")
+            .child("result"));
+    zillow::print(response);
+}
+
+void parseDeepCompsResults() {
+    pugi::xml_document doc;
+    pugi::xml_parse_result parseResults = doc.load_file("deepCompsResults.xml");
+
+    auto request = zillow::parseDeepCompsRequest(
+        doc.child("Comps:comps").child("request"));
+    fmt::print("request: \n\tzpid: {0}\n\tcount : {1}\n", std::get<0>(request),
+               std::get<1>(request));
+
+    auto message =
+        zillow::parseMessage(doc.child("Comps:comps").child("message"));
+    fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
+               std::get<1>(message));
+
+    // zillow::dfs(rootNode.child("response").child("properties"), "");
+    std::vector<zillow::DeepSearchResults> housses;
+    std::vector<zillow::EdgeData> edges;
+    std::tie(housses, edges) = zillow::parseDeepCompsResponse(
+        doc.child("Comps:comps").child("response").child("properties"));
+
+    for (auto const &item : housses) {
+        fmt::print("================{}==============\n", item.zpid);
+        zillow::print(item);
     }
+
+    for (auto const &item : edges) {
+        zillow::print(item);
+    }
+
+    // zillow::print(response);
 }
 
 int main() {
@@ -48,23 +74,8 @@ int main() {
     // std::cout << "Query zipcode: " << query_zipcode.evaluate_string(doc)
     //           << "\n";
 
-    // dfs(info, std::string("/") + std::string(info.name()));
-    {
-        pugi::xml_document doc;
-        pugi::xml_parse_result parseResults =
-            doc.load_file("deepSearchResults.xml");
-        pugi::xml_node root = doc.child("SearchResults:searchresults");
-        parse(root, std::string(""));
-    }
-
-    // {
-    //     pugi::xml_document doc;
-    //     pugi::xml_parse_result parseResults =
-    //         doc.load_file("deepCompsResults.xml");
-    //     pugi::xml_node info = doc.child("Comps:comps");
-    //     DOMSearch results(info);
-    //     results.print();
-    // }
+    // parseDeepSearchResults();
+    parseDeepCompsResults();
 
     return 0;
 }

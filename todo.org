@@ -12,12 +12,20 @@
 * TODO From a excel file write the output data in JSON format that can be understandable by cereal. Information will be imported to a vector of tuples.
 * TODO Only use MATLAB to do some Excel related tasks.
 * TODO How to compute the score between two houses
-* TODO Function parseAddress will return a tuple which has address information
-* TODO Funnction parseLinks will return a tuple which has zillow links
-* TODO Function parseZEstimate will return a tuple which has all zillow estimate information.
-* TODO Function getDeepSearchResults will return a deep search results of a given xml_node.
-* TODO SaleRecord will has these information: SellerAgent, BuyerAgent, SoldDate, SoldPrice, Notes (random notes collected from users)
+* DONE Function parseAddress will return a tuple which has address information
+  CLOSED: [2016-06-09 Thu 17:30]
+* DONE Funnction parseLinks will return a tuple which has zillow links
+  CLOSED: [2016-06-09 Thu 17:30]
+* DONE Function parseZEstimate will return a tuple which has all zillow estimate information.
+  CLOSED: [2016-06-09 Thu 17:30]
+* DONE Function getDeepSearchResults will return a deep search results of a given xml_node.
+  CLOSED: [2016-06-09 Thu 17:30]
+* TODO SaleRecord will has these information: SellerAgent, BuyerAgent, SoldDate, SoldPrice, SoldPriceCurrency, Notes (random notes collected from users)
 * TODO Houses table only have information about fact of houses such as address, links, and rooms etc.
 * TODO ZEstimate will have all zestimate information for a house.
 * TODO Have a undirected weighted graph data structure to store DeepComps results.
 * TODO Write a mobile app that can give users information related to a house and/or area. It also give users pleminary advice about buying a house for living and/or investment.
+* TODO A client which can automatically crawl all house information related to a given house must be in the same town?
+** Use BFS strategy. We will need to remove nodes which are not in the same town.
+** A web crawler will need to operate on the string stream. We should not create unneccesary temporary data.
+
