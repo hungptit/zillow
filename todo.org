@@ -28,4 +28,6 @@
 * TODO A client which can automatically crawl all house information related to a given house must be in the same town?
 ** Use BFS strategy. We will need to remove nodes which are not in the same town.
 ** A web crawler will need to operate on the string stream. We should not create unneccesary temporary data.
-
+* TODO Save all raw data to DeepSearchResults, DeepCompsResults, and UpdatedDetailsResults leveldb database.
+* TODO Serialize all processed data into leveldb + sqlite databases?
+* TODO 

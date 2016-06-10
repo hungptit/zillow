@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "zillow/Serialization.hpp"
+#include "zillow/Serialization.hpp"
 #include "zillow/XMLParser.hpp"
 
 void parseDeepSearchResults() {
@@ -28,6 +29,15 @@ void parseDeepSearchResults() {
             .child("results")
             .child("result"));
     zillow::print(response);
+
+    std::vector<decltype(response)> data{response, response};
+
+    {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, response);
+        zillow::print<cereal::XMLOutputArchive>(os, response);
+        fmt::print("{}\n", os.str());
+    }
 }
 
 void parseDeepCompsResults() {
@@ -45,9 +55,10 @@ void parseDeepCompsResults() {
                std::get<1>(message));
 
     // zillow::dfs(rootNode.child("response").child("properties"), "");
+    zillow::DeepSearchResults principal;
     std::vector<zillow::DeepSearchResults> housses;
     std::vector<zillow::EdgeData> edges;
-    std::tie(housses, edges) = zillow::parseDeepCompsResponse(
+    std::tie(principal, housses, edges) = zillow::parseDeepCompsResponse(
         doc.child("Comps:comps").child("response").child("properties"));
 
     for (auto const &item : housses) {
@@ -58,8 +69,6 @@ void parseDeepCompsResults() {
     for (auto const &item : edges) {
         zillow::print(item);
     }
-
-    // zillow::print(response);
 }
 
 int main() {
@@ -74,8 +83,8 @@ int main() {
     // std::cout << "Query zipcode: " << query_zipcode.evaluate_string(doc)
     //           << "\n";
 
-    // parseDeepSearchResults();
-    parseDeepCompsResults();
+    parseDeepSearchResults();
+    // parseDeepCompsResults();
 
     return 0;
 }
