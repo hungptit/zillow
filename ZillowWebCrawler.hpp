@@ -126,19 +126,16 @@ namespace zillow {
 
             Visited.insert(zpid);
 
-            // Save the raw data to database
-
-            // Save processed data to database
-
-            // Save raw data to a file.
-            writeTextFile(output, std::to_string(zpid) + ".xml");
-
             // Update vertexes
-            // vertexes.emplace_back(std::move(response));
+            vertexes.emplace_back(std::move(response));
 
             // Now crawl more data
             Queue.push_back(zpid);
             traverse(count);
+        }
+
+        void save() const {
+            // std::set<DeepSearchResults> results(vertexes.begin(), vertexes.end());
         }
 
         // Will need to use BFS traversal.
@@ -165,7 +162,7 @@ namespace zillow {
                     doc.child("Comps:comps").child("message"));
 
                 if (std::get<1>(message)) {
-                    fmt::print("Could not query this address: {}\n", queryCmd);
+                    fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
                     return;
                 }
 
@@ -179,9 +176,9 @@ namespace zillow {
 
                 // Update vertex information
                 Visited.insert(zpid);
-                vertexes.emplace_back(principal);
 
-                // Loop over children of the curren node
+                // Update edge information
+
                 for (auto const &aHouse : housses) {
                     auto child_zpid = aHouse.zpid;
                     auto aCity = std::get<CITY>(aHouse.address);
