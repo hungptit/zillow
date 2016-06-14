@@ -38,8 +38,8 @@ namespace zillow {
     enum ZESTIMATE {
         ZESTIMATE_CURRENCY = 0,
         ZESTIMATE_AMOUNT = 1,
-        ZESTIMATE_LOW = 2,
-        ZESTIMATE_HIGH = 3,
+        ZESTIMATE_LOW = 2, 
+c       ZESTIMATE_HIGH = 3,
         ZESTIMATE_LAST_UPDATED = 4
     };
     using Zestimate =
