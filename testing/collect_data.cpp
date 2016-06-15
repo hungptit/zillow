@@ -21,6 +21,8 @@ int main(int argc, char **argv) {
       ("street,a", po::value<std::string>(), "Street")
       ("city,c", po::value<std::string>(),"City")
       ("state,s", po::value<std::string>(), "State")
+      ("desired-cities,t", po::value<std::vector<std::string>>(), "Desired cities.")
+      ("desired-states,b", po::value<std::vector<std::string>>(), "Desired states.")
       ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
     // clang-format on
 
@@ -39,7 +41,7 @@ int main(int argc, char **argv) {
         return false;
     }
 
-    bool verbose = vm.count("verbose");
+    // bool verbose = vm.count("verbose");
 
     std::string street;
     if (vm.count("street")) {
@@ -68,44 +70,13 @@ int main(int argc, char **argv) {
     std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";
     if (vm.count("zwpid")) {
         zwpid = vm["zwpid"].as<std::string>();
-    }   
-
-    std::string queryCmd = zillow::generateDeepSearchQuery(zwpid, zillow::Address(street, 0, city, state, 0.0, 0.0));
-    if (verbose) {
-        fmt::print("Query link: {}\n", queryCmd);
     }
 
-    std::stringstream output;
-    bool status = zillow::query(queryCmd, output);
-    if (!status) {
-        fmt::print("Cannot query this link: {}", queryCmd);
-    } else {
-        pugi::xml_document doc;
-        pugi::xml_parse_result parseResults = doc.load(output);
-        assert(parseResults == pugi::status_ok);
-
-        {
-            auto request = zillow::parseDeepSearchResultsRequest(
-                doc.child("SearchResults:searchresults").child("request"));
-            fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
-                       std::get<0>(request), std::get<1>(request));
-
-            auto message = zillow::parseMessage(
-                doc.child("SearchResults:searchresults").child("message"));
-            fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
-                       std::get<1>(message));
-
-            auto response = zillow::parseDeepSearchResultsResponse(
-                doc.child("SearchResults:searchresults")
-                .child("response")
-                .child("results")
-                .child("result"));
-
-            std::ostringstream os;
-            zillow::print<cereal::JSONOutputArchive>(os, response);
-            fmt::print("{}\n", os.str());
-        }
+    {
+        zillow::Crawler crawler(zwpid);
+        crawler.save();
+        // crawler.exec(std::make_tuple(street,0, city, state, 0.0, 0.0), 25);
     }
-
+   
     return 0;
 }

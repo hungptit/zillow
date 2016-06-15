@@ -54,17 +54,19 @@ int main(int argc, char **argv) {
         zwpid = vm["zwpid"].as<std::string>();
     }
 
-    fmt::MemoryWriter output;
-    output << "http://www.zillow.com/webservice/"
-           << "GetDeepComps.htm?zws-id=" << zwpid << "&zpid=" << zpid
-           << "&count=" << count;
-
+    std::string queryCmd = zillow::generateDeepCompsQuery(zwpid, zpid, count);
+    
     if (verbose) {
-        fmt::print("Query link: {}\n", output.str());
+        fmt::print("Query link: {}\n", queryCmd);
     }
+    std::stringstream output;
+    auto results = zillow::query(queryCmd, output);
 
-    auto results = zillow::query(output.str());
-    fmt::print("{}\n", results);
+    if (results) {        
+        fmt::print("{}\n", output.str());
+    } else {
+        fmt::print("Could query this link: {}\n", queryCmd);
+    }
 
     return 0;
 }

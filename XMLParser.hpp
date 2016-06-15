@@ -9,151 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Zillow.hpp"
+
 namespace zillow {
-    using EdgeData = std::tuple<unsigned long, unsigned long, double>;
-
-    enum ADDRESS {
-        STREET = 0,
-        ZIPCODE = 1,
-        CITY = 2,
-        STATE = 3,
-        LATITUDE = 4,
-        LONGITUDE = 5
-    };
-    using Address =
-        std::tuple<std::string, int, std::string, std::string, double, double>;
-
-    enum LINKS {
-        HOMEDETAILS = 0,
-        GRAPHSANDDATA = 1,
-        MAPTHISHOME = 2,
-        COMPARABLES = 3
-    };
-    using Links =
-        std::tuple<std::string, std::string, std::string, std::string>;
-
-    enum ZESTIMATE {
-        CURRENCY = 0,
-        AMOUNT = 1,
-        LOW = 2,
-        HIGH = 3,
-        LASTUPDATED = 4
-    };
-    using Zestimate =
-        std::tuple<std::string, double, double, double, std::string>;
-
-    enum HOUSEGENERALINFO {
-        USECODE = 0,
-        YEARBUILT = 1,
-        LOTSIZESQFT = 2,
-        FINISHEDSQFT = 3,
-        BATHROOMS = 4,
-        BEDROOMS = 5,
-        TOTALROOMS = 6
-    };
-    using HouseGeneralInfo =
-        std::tuple<std::string, int, double, double, double, int, int>;
-
-    enum TAXINFO { TAX_ASSESSMENT_YEAR = 0, TAX_ASSESSMENT = 1 };
-    using TaxInfo = std::tuple<int, double>;
-
-    enum HOUSESALERECORD {
-        LAST_SOLD_DATE = 0,
-        LAST_SOLD_PRICE = 1,
-        LAST_SOLD_PRICE_CURRENCY = 2
-    };
-    using HouseSaleRecord = std::tuple<std::string, double, std::string>;
-
-    enum QUERYREQUEST { TEXT = 0, CODE = 1 };
-    using QueryRequest = std::tuple<std::string, std::string>;
-
-    struct DeepSearchResults {
-        unsigned long zpid;
-        Links links;
-        Address address;
-        Zestimate zestimate;
-        HouseGeneralInfo info;
-        TaxInfo tax;
-        HouseSaleRecord saleRecord;
-    };
-
-    using HashTable = std::unordered_map<std::string, std::string>;
-
-    // Functions which can be used to display results.
-    template <typename T> void print(const T &data);
-
-    template <> void print<HashTable>(const HashTable &data) {
-        std::map<std::string, std::string> sortedData(data.begin(), data.end());
-        for (auto const &item : sortedData) {
-            fmt::print("\"{0}\" - {1}\n", item.first, item.second);
-        }
-    }
-
-    template <> void print<EdgeData>(const EdgeData &data) {
-        fmt::print("{0} <--> {1} with score = {2}\n", std::get<0>(data),
-                   std::get<1>(data), std::get<2>(data));
-    }
-
-    template <> void print<DeepSearchResults>(const DeepSearchResults &data) {
-        fmt::MemoryWriter writer;
-        // Display zpid
-        writer << "zpid: \t" << data.zpid << "\n";
-
-        // Display links
-        writer << "links:\n"
-               << "\thomedetails: " << std::get<HOMEDETAILS>(data.links) << "\n"
-               << "\tgraphanddata: " << std::get<GRAPHSANDDATA>(data.links)
-               << "\n"
-               << "\tmapthishome: " << std::get<MAPTHISHOME>(data.links) << "\n"
-               << "\tcomparables: " << std::get<COMPARABLES>(data.links)
-               << "\n";
-
-        // Display address
-        writer << "address: \n"
-               << "\tstreet: " << std::get<STREET>(data.address) << "\n"
-               << "\tzipcode: " << std::get<ZIPCODE>(data.address) << "\n"
-               << "\tcity: " << std::get<CITY>(data.address) << "\n"
-               << "\tstate: " << std::get<STATE>(data.address) << "\n"
-               << "\tlatitude: " << std::get<LATITUDE>(data.address) << "\n"
-               << "\tlongitude: " << std::get<LONGITUDE>(data.address) << "\n";
-
-        // Display other information
-        writer << "useCode: " << std::get<USECODE>(data.info) << "\n";
-        writer << "yearBuilt: " << std::get<YEARBUILT>(data.info) << "\n";
-        writer << "lotSizeSqFt: " << std::get<LOTSIZESQFT>(data.info) << "\n";
-        writer << "finishedSqFt: " << std::get<FINISHEDSQFT>(data.info) << "\n";
-        writer << "bathrooms: " << std::get<BATHROOMS>(data.info) << "\n";
-        writer << "bedrooms: " << std::get<BEDROOMS>(data.info) << "\n";
-        writer << "totalRooms: " << std::get<TOTALROOMS>(data.info) << "\n";
-
-        writer << "taxAssessmentYear: "
-               << std::get<TAX_ASSESSMENT_YEAR>(data.tax) << "\n";
-        writer << "taxAssessment: " << std::get<TAX_ASSESSMENT>(data.tax)
-               << "\n";
-
-        writer << "lastSoldDate: " << std::get<LAST_SOLD_DATE>(data.saleRecord)
-               << "\n";
-        writer << "lastSoldPrice: "
-               << std::get<LAST_SOLD_PRICE>(data.saleRecord) << "\n";
-        writer << "lastSoldPriceCurrency: "
-               << std::get<LAST_SOLD_PRICE_CURRENCY>(data.saleRecord) << "\n";
-
-        // Display zestimate
-        writer << "zestimate: "
-               << "\n\tcurrency: " << std::get<CURRENCY>(data.zestimate)
-               << "\n\tamount: " << std::get<AMOUNT>(data.zestimate)
-               << "\n\tlow: " << std::get<LOW>(data.zestimate)
-               << "\n\thigh: " << std::get<HIGH>(data.zestimate)
-               << "\n\tlast-updated: " << std::get<LASTUPDATED>(data.zestimate)
-               << "\n";
-
-        // Output to the stdout.
-        fmt::print("{}", writer.str());
-    }
-
     class NodeParser {
       public:
-        NodeParser(pugi::xml_node root) { traverse(root, ""); }
+        explicit NodeParser(pugi::xml_node root) { traverse(root, ""); }
 
         const HashTable getData() const { return Data; }
 
@@ -183,6 +44,12 @@ namespace zillow {
         HashTable Data;
     };
 
+    /** 
+     * This API will be used for debugging purpose.
+     *
+     * @param aNode 
+     * @param prefix 
+     */
     void dfs(pugi::xml_node aNode, const std::string &prefix) {
         for (pugi::xml_node aChild = aNode.first_child(); aChild;
              aChild = aChild.next_sibling()) {
@@ -214,10 +81,10 @@ namespace zillow {
      * @return
      */
     Links parseLinks(const HashTable &data) {
-        return std::make_tuple(data.find("/links/homedetails/")->second,
-                               data.find("/links/graphsanddata/")->second,
-                               data.find("/links/mapthishome/")->second,
-                               data.find("/links/comparables/")->second);
+        return Links(data.find("/links/homedetails/")->second,
+                     data.find("/links/graphsanddata/")->second,
+                     data.find("/links/mapthishome/")->second,
+                     data.find("/links/comparables/")->second);
     }
 
     /**
@@ -228,13 +95,12 @@ namespace zillow {
      * @return
      */
     Address parseAddress(const HashTable &data) {
-        return std::make_tuple(
-            data.find("/address/street/")->second,
-            std::stoi(data.find("/address/zipcode/")->second),
-            data.find("/address/city/")->second,
-            data.find("/address/state/")->second,
-            std::stod(data.find("/address/latitude/")->second),
-            std::stod(data.find("/address/longitude/")->second));
+        return Address(data.find("/address/street/")->second,
+                       std::stoi(data.find("/address/zipcode/")->second),
+                       data.find("/address/city/")->second,
+                       data.find("/address/state/")->second,
+                       std::stod(data.find("/address/latitude/")->second),
+                       std::stod(data.find("/address/longitude/")->second));
     }
 
     /**
@@ -244,7 +110,7 @@ namespace zillow {
      *
      * @return
      */
-    Zestimate parseZestimate(const HashTable &data) {
+    ZEstimate parseZestimate(const HashTable &data) {
         HashTable::const_iterator it;
 
         it = data.find("/zestimate/amount/");
@@ -262,15 +128,15 @@ namespace zillow {
         it = data.find("/zestimate/amount/currency");
         std::string currency = (it != data.end()) ? it->second : "USD";
 
-        return std::make_tuple(currency, amount, low, high, lastUpdated);
+        return ZEstimate(amount, low, high, currency, lastUpdated);
     }
 
-    HouseSaleRecord parseSaleRecord(const HashTable &data) {
+    SaleRecord parseSaleRecord(const HashTable &data) {
         HashTable::const_iterator it;
 
         it = data.find("/lastSoldDate/");
         std::string lastSoldDate =
-            (it != data.end()) ? it->second : "01/01/1900";
+            (it != data.end()) ? it->second : "01/01/1990";
 
         it = data.find("/lastSoldPrice/");
         double lastSoldPrice = (it != data.end()) ? std::stod(it->second) : 0.0;
@@ -278,23 +144,22 @@ namespace zillow {
         it = data.find("/lastSoldPriceCurrency/");
         std::string lastSoldPriceCurrency =
             (it != data.end()) ? it->second : "USD";
-        return std::make_tuple(lastSoldDate, lastSoldPrice,
-                               lastSoldPriceCurrency);
+        return SaleRecord(lastSoldDate, lastSoldPrice, lastSoldPriceCurrency);
     }
 
     TaxInfo parseTaxInfo(const HashTable &data) {
         HashTable::const_iterator it;
         it = data.find("/taxAssessmentYear/");
         int taxAssessmentYear =
-            (it != data.end()) ? std::stoi(it->second) : 1900;
+            (it != data.end()) ? std::stoi(it->second) : 1990;
 
         it = data.find("/taxAssessment/");
         double taxAssessment = (it != data.end()) ? std::stod(it->second) : 0.0;
 
-        return std::make_tuple(taxAssessmentYear, taxAssessment);
+        return TaxInfo(taxAssessmentYear, taxAssessment);
     }
 
-    HouseGeneralInfo parseHouseGeneralInfo(const HashTable &data) {
+    HouseInfo parseHouseGeneralInfo(const HashTable &data) {
         HashTable::const_iterator it;
 
         it = data.find("/useCode/");
@@ -318,8 +183,8 @@ namespace zillow {
         it = data.find("/totalRooms/");
         int totalRooms = (it != data.end()) ? std::stod(it->second) : 0;
 
-        return std::make_tuple(useCode, yearBuilt, lotSizeSqFt, finishedSqFt,
-                               bathrooms, bedrooms, totalRooms);
+        return HouseInfo(parseAddress(data), useCode, yearBuilt, lotSizeSqFt, finishedSqFt,
+                         bathrooms, bedrooms, totalRooms);
     }
 
     auto parseDeepSearchResultsRequest(pugi::xml_node rootNode) {
@@ -351,18 +216,28 @@ namespace zillow {
     }
 
     bool validateData(const HashTable &data) {
-        bool isValid =
-            ((data.size() == 40) || (data.size() == 41) || (data.size() == 42));
+        bool isValid = ((data.size() > 30) && (data.size() < 44));
         if (!isValid) {
             fmt::print("==============================\n");
-            print(data);
+            fmt::print("Number of elements: {}\n", data.size());
+            std::map<std::string, std::string> sortedData(data.begin(),
+                                                          data.end());
+            for (auto const &item : sortedData) {
+                fmt::print("\"{0}\" - {1}\n", item.first, item.second);
+            }
+        } else {
+            // fmt::print("==============================\n");
+            // fmt::print("Number of elements: {}\n", data.size());
+            // std::map<std::string, std::string> sortedData(data.begin(),
+            // data.end());
+            // for (auto const &item : sortedData) {
+            //     fmt::print("\"{0}\" - {1}\n", item.first, item.second);
+            // }
         }
         return isValid;
     }
 
     DeepSearchResults extractData(const HashTable &data) {
-        DeepSearchResults results;
-
         // Make sure that our code is in sync with the latest results.
         assert(validateData(data));
 
@@ -370,16 +245,10 @@ namespace zillow {
         HashTable::const_iterator it;
         it = data.find("/zpid/");
         assert(it != data.end()); // This field must exist
-        results.zpid = std::stoul(it->second);
+        auto zpid = std::stoul(it->second);
 
-        results.links = parseLinks(data);
-        results.address = parseAddress(data);
-        results.zestimate = parseZestimate(data);
-        results.info = parseHouseGeneralInfo(data);
-        results.tax = parseTaxInfo(data);
-        results.saleRecord = parseSaleRecord(data);
-
-        return results;
+        return DeepSearchResults(zpid, parseHouseGeneralInfo(data),parseLinks(data), parseTaxInfo(data), parseSaleRecord(data),
+                                 parseZestimate(data));
     }
 
     DeepSearchResults parseDeepSearchResultsResponse(pugi::xml_node rootNode) {
@@ -387,7 +256,8 @@ namespace zillow {
         return extractData(parser.getData());
     }
 
-    std::tuple<std::vector<DeepSearchResults>, std::vector<EdgeData>>
+    std::tuple<DeepSearchResults, std::vector<DeepSearchResults>,
+               std::vector<EdgeData>>
     parseDeepCompsResponse(pugi::xml_node rootNode) {
         std::vector<DeepSearchResults> results;
         std::vector<EdgeData> edges;
@@ -396,7 +266,6 @@ namespace zillow {
         auto principal =
             parseDeepSearchResultsResponse(rootNode.child("principal"));
         auto principal_zpid = principal.zpid;
-        results.emplace_back(std::move(principal));
 
         // Get the comparison
         pugi::xml_node comps = rootNode.child("comparables");
@@ -407,13 +276,13 @@ namespace zillow {
             auto info = parseDeepSearchResultsResponse(aChild);
             HashTable::const_iterator it = data.find("/score");
             assert(it != data.end()); // score property must exist.
-            edges.emplace_back(std::make_tuple(principal_zpid, info.zpid,
+            edges.emplace_back(EdgeData(principal_zpid, info.zpid,
                                                std::stod(it->second)));
             results.emplace_back(std::move(info));
         }
 
         // Return
-        return std::make_tuple(results, edges);
+        return std::make_tuple(principal, results, edges);
     }
 }
 

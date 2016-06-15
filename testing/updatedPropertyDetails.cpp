@@ -54,18 +54,23 @@ int main(int argc, char **argv) {
         zwpid = vm["zwpid"].as<std::string>();
     }
 
-    fmt::MemoryWriter output;
-    output << "http://www.zillow.com/webservice/"
-              "GetUpdatedPropertyDetails.htm?zws-id="
-           << zwpid << "&"
-           << "&zpid=" << zpid;
+    fmt::MemoryWriter input;
+    input << "http://www.zillow.com/webservice/"
+             "GetUpdatedPropertyDetails.htm?zws-id="
+          << zwpid << "&"
+          << "&zpid=" << zpid;
 
     if (verbose) {
-        fmt::print("Query link: {}\n", output.str());
+        fmt::print("Query link: {}\n", input.str());
     }
 
-    auto results = zillow::query(output.str());
-    fmt::print("{}\n", results);
+    std::stringstream output;
+    auto results = zillow::query(input.str(), output);
+    if (results) {
+        fmt::print("{}\n", output.str());
+    } else {
+        fmt::print("Could query this link: {}\n", input.str());
+    }
 
     return 0;
 }
