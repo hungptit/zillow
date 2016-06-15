@@ -3,81 +3,218 @@
 
 #include <string>
 #include <tuple>
-#include <vector>
 #include <unordered_map>
+#include <vector>
+
+// Cereal
+#include "cereal/archives/binary.hpp"
+#include "cereal/archives/json.hpp"
+#include "cereal/archives/portable_binary.hpp"
+#include "cereal/archives/xml.hpp"
+#include "cereal/types/array.hpp"
+#include "cereal/types/bitset.hpp"
+#include "cereal/types/chrono.hpp"
+#include "cereal/types/complex.hpp"
+#include "cereal/types/deque.hpp"
+#include "cereal/types/forward_list.hpp"
+#include "cereal/types/queue.hpp"
+#include "cereal/types/set.hpp"
+#include "cereal/types/string.hpp"
+#include "cereal/types/tuple.hpp"
+#include "cereal/types/unordered_map.hpp"
+#include "cereal/types/unordered_set.hpp"
+#include "cereal/types/utility.hpp"
+#include "cereal/types/valarray.hpp"
+#include "cereal/types/vector.hpp"
 
 namespace zillow {
-    enum EDGEDATA { SRC_ID, DST_ID, SCORE, EDGEDATA_LEN };
-    using EdgeData = std::tuple<unsigned long, unsigned long, double>;
+    using IDType = unsigned int;
+    using HashTable = std::unordered_map<std::string, std::string>;
+    using Real = double;
 
-    enum ADDRESS {
-        STREET = 0,
-        ZIPCODE = 1,
-        CITY = 2,
-        STATE = 3,
-        LATITUDE = 4,
-        LONGITUDE = 5
+    struct EdgeData {
+        explicit EdgeData(const IDType srcId, const IDType dstId, Real score)
+            : SrcID(srcId), DstID(dstId), Score(score) {}
+
+        IDType SrcID;
+        IDType DstID;
+        Real Score;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("src_id", SrcID),
+               cereal::make_nvp("dst_id", DstID),
+               cereal::make_nvp("score", Score));
+        }
     };
-    using Address =
-        std::tuple<std::string, int, std::string, std::string, double, double>;
 
-    enum LINKS {
-        HOMEDETAILS = 0,
-        GRAPHSANDDATA = 1,
-        MAPTHISHOME = 2,
-        COMPARABLES = 3
+    struct Address {
+        explicit Address(const std::string &street, const int zipcode,
+                         const std::string &city, const std::string &state,
+                         const Real latitude, const Real longitude)
+            : Street(street), ZipCode(zipcode), City(city), State(state),
+              Latitude(latitude), Longitude(longitude) {}
+        std::string Street;
+        int ZipCode;
+        std::string City;
+        std::string State;
+        Real Latitude;
+        Real Longitude;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("street", Street),
+               cereal::make_nvp("city", City), cereal::make_nvp("state", State),
+               cereal::make_nvp("latitude", Latitude),
+               cereal::make_nvp("longitude", Longitude));
+        }
     };
-    using Links =
-        std::tuple<std::string, std::string, std::string, std::string>;
 
-    enum ZESTIMATE {
-        ZESTIMATE_CURRENCY = 0,
-        ZESTIMATE_AMOUNT = 1,
-        ZESTIMATE_LOW = 2,
-        ZESTIMATE_HIGH = 3,
-        ZESTIMATE_LAST_UPDATED = 4
+    struct Links {
+        explicit Links(const std::string &homedetails,
+                       const std::string &graphanddata,
+                       const std::string &mapthishome,
+                       const std::string &comparables)
+            : HomeDetails(homedetails), GraphAndData(graphanddata),
+              MapThisHome(mapthishome), Comparables(comparables) {}
+
+        std::string HomeDetails;
+        std::string GraphAndData;
+        std::string MapThisHome;
+        std::string Comparables;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("homedetails", HomeDetails),
+               cereal::make_nvp("graphsanddata", GraphAndData),
+               cereal::make_nvp("mapthishome", MapThisHome),
+               cereal::make_nvp("comparables", Comparables));
+        }
     };
-    using Zestimate =
-        std::tuple<std::string, double, double, double, std::string>;
 
-    enum HOUSE_GENERAL_INFO {
-        USECODE = 0,
-        YEARBUILT = 1,
-        LOTSIZESQFT = 2,
-        FINISHEDSQFT = 3,
-        BATHROOMS = 4,
-        BEDROOMS = 5,
-        TOTALROOMS = 6
+    struct ZEstimate {
+        explicit ZEstimate()
+            : Amount(), Low(), High(), Currency("USB"),
+              LastUpdated("01/01/1990"){};
+
+        explicit ZEstimate(Real amount, Real low,
+                           Real high, const std::string &currency, const std::string &last_updated)
+            : Amount(amount), Low(low), High(high), Currency(currency),
+              LastUpdated(last_updated) {}
+        Real Amount;
+        Real Low;
+        Real High;
+        std::string Currency;
+        std::string LastUpdated;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("currency", Currency),
+               cereal::make_nvp("amount", Amount), cereal::make_nvp("low", Low),
+               cereal::make_nvp("high", High),
+               cereal::make_nvp("last_updated", LastUpdated));
+        }
     };
-    using HouseGeneralInfo =
-        std::tuple<std::string, int, double, double, double, int, int>;
 
-    enum TAXINFO { TAX_ASSESSMENT_YEAR, TAX_ASSESSMENT };
-    using TaxInfo = std::tuple<int, double>;
+    struct HouseInfo {
+        explicit HouseInfo(const Address &address, const std::string &useCode,
+                           const int yearBuilt, Real lotSizeSqFt,
+                           Real finishedSqFt, Real bathrooms, int bedrooms,
+                           int totalRooms)
+            : HouseAddress(address), UseCode(useCode), YearBuilt(yearBuilt),
+              LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt),
+              Bathrooms(bathrooms), Bedrooms(bedrooms), TotalRooms(totalRooms) {
+        }
+        Address HouseAddress;
+        std::string UseCode;
+        int YearBuilt;
+        Real LotSizeSqFt;
+        Real FinishedSqFt;
+        Real Bathrooms;
+        int Bedrooms;
+        int TotalRooms;
 
-    enum HOUSE_SALE_RECORD {
-        LAST_SOLD_DATE = 0,
-        LAST_SOLD_PRICE = 1,
-        LAST_SOLD_PRICE_CURRENCY = 2
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("address", HouseAddress),
+               cereal::make_nvp("useCode", UseCode),
+               cereal::make_nvp("yearBuilt", YearBuilt),
+               cereal::make_nvp("lotSizeSqFt", LotSizeSqFt),
+               cereal::make_nvp("finishedSqFt", FinishedSqFt),
+               cereal::make_nvp("bathrooms", Bathrooms),
+               cereal::make_nvp("bedrooms", Bedrooms),
+               cereal::make_nvp("totalRooms", TotalRooms));
+        }
     };
-    using HouseSaleRecord = std::tuple<std::string, double, std::string>;
 
-    enum QUERY_REQUEST { QUERY_STREET = 0, QUERY_CITYSTATEZIP = 1 };
-    using QueryRequest = std::tuple<std::string, std::string>;
+    struct TaxInfo {
+        explicit TaxInfo() : TaxAssessmentYear(1990), TaxAssessment(0.0) {}
+        explicit TaxInfo(const int year, const Real assessment)
+            : TaxAssessmentYear(year), TaxAssessment(assessment) {}
+        int TaxAssessmentYear;
+        Real TaxAssessment;
 
-    enum MESSAGE { TEXT = 0, CODE = 1 };
-    using Message = std::tuple<std::string, std::string>;
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("taxAssessmentYear", TaxAssessmentYear),
+               cereal::make_nvp("taxAssessment", TaxAssessment));
+        }
+    };
+
+    struct SaleRecord {
+        explicit SaleRecord()
+            : LastSoldDate("01/01/1990"), LastSoldPrice(0.0), Currency("USD") {}
+        explicit SaleRecord(const std::string &soldDate, const Real soldPrice,
+                            const std::string &currency)
+            : LastSoldDate(soldDate), LastSoldPrice(soldPrice),
+              Currency(currency) {}
+
+        std::string LastSoldDate;
+        Real LastSoldPrice;
+        std::string Currency;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("lastSoldDate", LastSoldDate),
+               cereal::make_nvp("lastSoldPrice", LastSoldPrice),
+               cereal::make_nvp("Currency", Currency));
+        }
+    };
+
+    struct QueryRequest {
+        explicit QueryRequest(const std::string &street,
+                              const std::string &citystatezip)
+            : Street(street), CityStateZip(citystatezip) {}
+        std::string Street;
+        std::string CityStateZip;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("street", Street),
+               cereal::make_nvp("citystatezip", CityStateZip));
+        }
+    };
+
+    struct Message {
+        explicit Message(const std::string &text, const int code)
+            : Text(text), Code(code) {}
+        std::string Text;
+        int Code;
+    };
 
     struct DeepSearchResults {
+        explicit DeepSearchResults(unsigned long zid, const HouseInfo &hinfo,
+                                   const Links &zlinks, const TaxInfo &tinfo,
+                                   const SaleRecord &srecord,
+                                   const ZEstimate &zes)
+            : zpid(zid), info(hinfo), links(zlinks), tax(tinfo),
+              saleRecord(srecord), zestimate(zes) {}
         unsigned long zpid;
+        HouseInfo info;
         Links links;
-        Address address;
-        Zestimate zestimate;
-        HouseGeneralInfo info;
         TaxInfo tax;
-        HouseSaleRecord saleRecord;
-    };
+        SaleRecord saleRecord;
+        ZEstimate zestimate;
 
-    using HashTable = std::unordered_map<std::string, std::string>;
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("zpid", zpid), cereal::make_nvp("links", links),
+               cereal::make_nvp("house-info", info),
+               cereal::make_nvp("tax-info", tax),
+               cereal::make_nvp("sale-record", saleRecord),
+               cereal::make_nvp("zestimate", zestimate));
+        }
+    };
 }
 #endif

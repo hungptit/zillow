@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "zillow/Database.hpp"
 #include "zillow/Serialization.hpp"
 #include "zillow/Serialization.hpp"
 #include "zillow/XMLParser.hpp"
@@ -12,6 +13,8 @@ void parseDeepSearchResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
         doc.load_file("deepSearchResults.xml");
+
+    // assert(parseResults == pugi::status_ok);
 
     auto request = zillow::parseDeepSearchResultsRequest(
         doc.child("SearchResults:searchresults").child("request"));
@@ -28,7 +31,10 @@ void parseDeepSearchResults() {
             .child("response")
             .child("results")
             .child("result"));
-    zillow::print(response);
+
+    std::ostringstream os;
+    zillow::print<cereal::JSONOutputArchive>(os, response);
+    fmt::print("{}\n", os.str());
 
     std::vector<decltype(response)> data{response, response};
 
@@ -43,7 +49,7 @@ void parseDeepSearchResults() {
 void parseDeepCompsResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults = doc.load_file("deepCompsResults.xml");
-
+    // assert(parseResults == pugi::status_ok);
     auto request = zillow::parseDeepCompsRequest(
         doc.child("Comps:comps").child("request"));
     fmt::print("request: \n\tzpid: {0}\n\tcount : {1}\n", std::get<0>(request),
@@ -55,20 +61,36 @@ void parseDeepCompsResults() {
                std::get<1>(message));
 
     // zillow::dfs(rootNode.child("response").child("properties"), "");
-    zillow::DeepSearchResults principal;
-    std::vector<zillow::DeepSearchResults> housses;
-    std::vector<zillow::EdgeData> edges;
-    std::tie(principal, housses, edges) = zillow::parseDeepCompsResponse(
+    auto results = zillow::parseDeepCompsResponse(
         doc.child("Comps:comps").child("response").child("properties"));
 
-    for (auto const &item : housses) {
-        fmt::print("================{}==============\n", item.zpid);
-        zillow::print(item);
+    // const zillow::DeepSearchResults &principal = std::get<0>(results);
+    auto const &deepComps = std::get<1>(results);
+    auto const &edges = std::get<2>(results);
+
+    fmt::print("Number of comps element: {}\n", deepComps.size());
+    for (auto const &item : deepComps) {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, item);
+        fmt::print("{}\n", os.str());
     }
 
-    for (auto const &item : edges) {
-        zillow::print(item);
+    {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, deepComps);
+        fmt::print("{}\n", os.str());
+        // cereal::JSONOutputArchive oar(os);
+        // oar(deepComps);
     }
+
+    {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, edges);
+        fmt::print("{}\n", os.str());
+    }
+
+    // Write information to the database
+    zillow::writeToSQLite("database.db", deepComps, edges);
 }
 
 int main() {
@@ -84,7 +106,7 @@ int main() {
     //           << "\n";
 
     parseDeepSearchResults();
-    // parseDeepCompsResults();
+    parseDeepCompsResults();
 
     return 0;
 }

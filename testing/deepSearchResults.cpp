@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
         zwpid = vm["zwpid"].as<std::string>();
     }   
 
-    std::string queryCmd = zillow::generateDeepSearchQuery(zwpid, std::make_tuple(street,0, city, state, 0.0, 0.0));
+    std::string queryCmd = zillow::generateDeepSearchQuery(zwpid, zillow::Address(street, 0, city, state, 0.0, 0.0));
     if (verbose) {
         fmt::print("Query link: {}\n", queryCmd);
     }
@@ -82,6 +82,7 @@ int main(int argc, char **argv) {
     } else {
         pugi::xml_document doc;
         pugi::xml_parse_result parseResults = doc.load(output);
+        assert(parseResults == pugi::status_ok);
 
         {
             auto request = zillow::parseDeepSearchResultsRequest(

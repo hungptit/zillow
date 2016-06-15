@@ -45,17 +45,12 @@ namespace {
                cereal::make_nvp("address", address),
                cereal::make_nvp("age", age));
         }
-
-        template <typename Archive> void deserialize(Archive &ar) {
-            ar(cereal::make_nvp("name", name),
-               cereal::make_nvp("address", address),
-               cereal::make_nvp("age", age));
-        }
     };
 
     using A = std::tuple<std::string, std::string, std::string, int>;
     using B = std::tuple<std::string, std::string>;
     using C = std::tuple<std::string, int>;
+
 
     template <typename T> void print(const T &data);
     template <> void print(const A &a) {

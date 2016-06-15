@@ -36,23 +36,96 @@ namespace zillow {
                    "UNIQUE, street VARCHAR(128), city "
                    "VARCHAR(64) NOT NULL, state VARCHAR(3) NOT NULL)",
             now;
-        session << "CREATE TABLE IF NOT EXISTS SaleRecord (BIGINT zpid NOT "
-                   "NULL UNIQUE, lastSoldDate "
-                   "VARCHAR(128), LastSoldPrice REAL)",
+
+        session
+            << "CREATE TABLE Edges (BIGINT src_id NOT NULL, BIGINT dst_id NOT NULL, REAL score NOT NULL)",
             now;
 
-        // Now insert data to the database.
-        Statement insert(session);
-        insert<< "BEGIN";
-        // for (auto const &item : vertexes) {
-        //     session << "INSERT INTO House VALUE(?, ?, ?, ?)" << use(item.zpid)
-        //             << use(std::get<STREET>(item.address))
-        //             << use(std::get<CITY>(item.address))
-        //             << use(std::get<STATE>(item.address));
-                           
+        // Update House table.
+        {
+            
+        }
+        // // Update SaleRecord table
+        // {
+        //     session
+        //         << "CREATE TABLE IF NOT EXISTS SaleRecord (BIGINT zpid NOT "
+        //            "NULL UNIQUE, lastSoldDate "
+        //            "VARCHAR(128), LastSoldPrice REAL, Currency VARCHAR(16))",
+        //         now;
+        //     Statement insert(session);
+
+        //     // Get an std::vector of Poco::Tuple
+        //     using SaleRecordRow =
+        //         Poco::Tuple<IDType, std::string, double, std::string>;
+        //     std::vector<SaleRecordRow> data;
+        //     data.reserve(vertexes.size());
+        //     for (auto const &item : vertexes) {
+        //         data.emplace_back(SaleRecordRow(
+        //             item.zpid, item.saleRecord.LastSoldDate,
+        //             item.saleRecord.LastSoldPrice, item.saleRecord.Currency));
+        //     }
+        //     insert << "INSERT INTO SaleRecord VALUES (?, ?, ?, ?)", use(data);
+        //     insert.execute();
         // }
-        session << "END";
-        insert.execute();
+
+        // // Update ZEstimate table
+        // {
+        //     session
+        //         << "CREATE TABLE IF NOT EXISTS ZEstimate (BIGINT zpid NOT "
+        //            "NULL UNIQUE, TaxAssessmentYear INT, TaxAssessment REAL)",
+        //         now;
+        //     Statement insert(session);
+
+        //     // Get an std::vector of Poco::Tuple
+        //     using EdgesRow = Poco::Tuple<IDType, IDType, double>;
+        //     std::vector<EdgesRow> data;
+        //     data.reserve(edges.size());
+        //     for (auto const &item : vertexes) {
+        //         data.emplace_back(EdgesRow(item.zpid,
+        //                                    item.tax.TaxAssessmentYear,
+        //                                    item.tax.TaxAssessment));
+        //     }
+        //     insert << "INSERT INTO Tax VALUES (?, ?, ?)", use(data);
+        //     insert.execute();
+        // }
+
+        // // Update Tax table
+        // {
+        //     session
+        //         << "CREATE TABLE IF NOT EXISTS Tax (BIGINT zpid NOT "
+        //            "NULL UNIQUE, TaxAssessmentYear INT, TaxAssessment REAL)",
+        //         now;
+        //     Statement insert(session);
+
+        //     // Get an std::vector of Poco::Tuple
+        //     using EdgesRow = Poco::Tuple<IDType, IDType, double>;
+        //     std::vector<EdgesRow> data;
+        //     data.reserve(edges.size());
+        //     for (auto const &item : vertexes) {
+        //         data.emplace_back(EdgesRow(item.zpid,
+        //                                    item.tax.TaxAssessmentYear,
+        //                                    item.tax.TaxAssessment));
+        //     }
+        //     insert << "INSERT INTO Tax VALUES (?, ?, ?)", use(data);
+        //     insert.execute();
+        // }
+
+        // Update Edges table
+        {                       
+
+            // Get an std::vector of Poco::Tuple
+            using EdgesRow = Poco::Tuple<IDType, IDType, double>;
+            std::vector<EdgesRow> data;
+            data.reserve(edges.size());
+            for (auto const &item : edges) {
+                data.emplace_back(EdgesRow(item.SrcID, item.DstID, item.Score));
+            }
+            // Insert edge information into the Edges table
+
+            // Statement insert(session);
+            // insert << "INSERT INTO Edges VALUES (?, ?, ?)", use(data);
+            // insert.execute();
+        }
     }
 
     // void writeToNoSQLDatabase(const std::string &dataFile,

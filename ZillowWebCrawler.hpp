@@ -64,15 +64,15 @@ namespace zillow {
 
     std::string generateDeepSearchQuery(const std::string &zwpid,
                                         const Address &info) {
-        std::string aStreet(std::get<STREET>(info));
+        std::string aStreet(info.Street);
         strrep(aStreet, ' ', '+');
-        std::string aCity(std::get<CITY>(info));
+        std::string aCity(info.City);
         strrep(aCity, ' ', '+');
 
         return "http://www.zillow.com/webservice/"
                "GetDeepSearchResults.htm?zws-id=" +
                zwpid + "&address=" + aStreet + "&citystatezip=" + aCity +
-               "%2C+" + std::get<STATE>(info);
+               "%2C+" + info.State;
     }
 
     std::string generateDeepCompsQuery(const std::string &zwpid,
@@ -171,13 +171,12 @@ namespace zillow {
                     return;
                 }
 
-                DeepSearchResults principal;
-                std::vector<zillow::DeepSearchResults> housses;
-                std::vector<zillow::EdgeData> e;
-                std::tie(principal, housses, e) =
+                auto deepCompsResults = 
                     zillow::parseDeepCompsResponse(doc.child("Comps:comps")
                                                        .child("response")
-                                                       .child("properties"));
+                                                   .child("properties"));
+                auto const & houses = std::get<1>(deepCompsResults);
+                auto const & e = std::get<2>(deepCompsResults);
 
                 // Update vertex information
                 Visited.insert(zpid);
@@ -185,14 +184,14 @@ namespace zillow {
                 // Update edge information
                 std::move(e.begin(), e.end(), edges.end());
 
-                for (auto const &aHouse : housses) {
+                // Update house information
+                for (auto const &aHouse : houses) {
                     auto child_zpid = aHouse.zpid;
-                    auto aCity = std::get<CITY>(aHouse.address);
+                    auto aCity = aHouse.info.HouseAddress.City;
                     if (Visited.find(child_zpid) == Visited.end()) {
                         fmt::print("child_zpid = {0} -> {1}, {2} {3}\n",
-                                   child_zpid, std::get<STREET>(aHouse.address),
-                                   std::get<CITY>(aHouse.address),
-                                   std::get<STATE>(aHouse.address));
+                                   child_zpid, aHouse.info.HouseAddress.Street,
+                                   aHouse.info.HouseAddress.City, aHouse.info.HouseAddress.State);
                         Queue.push_back(child_zpid);
                         vertexes.emplace_back(aHouse);
                     }
