@@ -11,9 +11,11 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
 
+#include "XMLParser.hpp"
+#include "Zillow.hpp"
+#include "Database.hpp"
 #include "utils/LevelDBIO.hpp"
 
-#include "XMLParser.hpp"
 #include <deque>
 #include <fstream>
 #include <iostream>
@@ -79,14 +81,8 @@ namespace zillow {
                zwpid + "&zpid=" + std::to_string(zpid) + "&count=" +
                std::to_string(count);
     }
-
-    void writeTextFile(const std::stringstream &output,
-                       const std::string &dataFile) {
-        std::ofstream outputFile;
-        outputFile.open(dataFile);
-        outputFile << output.str() << "\n";
-    }
-
+  
+  
     // Craw all related data for a given house using DFS algorithms.
     class Crawler {
       public:
@@ -109,6 +105,7 @@ namespace zillow {
 
             pugi::xml_document doc;
             pugi::xml_parse_result parseResults = doc.load(output);
+            assert(parseResults == pugi::status_ok);
             auto message = zillow::parseMessage(
                 doc.child("SearchResults:searchresults").child("message"));
 
@@ -135,7 +132,12 @@ namespace zillow {
         }
 
         void save() const {
-            // std::set<DeepSearchResults> results(vertexes.begin(), vertexes.end());
+            // std::set<DeepSearchResults> results(vertexes.begin(),
+            // vertexes.end());
+            // Save to SQlite3 database.
+          writeToSQLite("database.db", vertexes, edges);
+          
+            //
         }
 
         // Will need to use BFS traversal.
@@ -152,24 +154,28 @@ namespace zillow {
                 std::stringstream output;
 
                 auto results = zillow::query(queryCmd, output);
+                assert(results);
+
                 writeTextFile(output,
                               "deepComps_" + std::to_string(zpid) + ".xml");
 
                 // Parse XML data
                 pugi::xml_document doc;
                 pugi::xml_parse_result parseResults = doc.load(output);
+                assert(parseResults == pugi::status_ok);
                 auto message = zillow::parseMessage(
                     doc.child("Comps:comps").child("message"));
 
                 if (std::get<1>(message)) {
-                    fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
+                    fmt::print("Error ===> Could not query this address: {}\n",
+                               queryCmd);
                     return;
                 }
 
                 DeepSearchResults principal;
                 std::vector<zillow::DeepSearchResults> housses;
-                std::vector<zillow::EdgeData> edges;
-                std::tie(principal, housses, edges) =
+                std::vector<zillow::EdgeData> e;
+                std::tie(principal, housses, e) =
                     zillow::parseDeepCompsResponse(doc.child("Comps:comps")
                                                        .child("response")
                                                        .child("properties"));
@@ -178,6 +184,7 @@ namespace zillow {
                 Visited.insert(zpid);
 
                 // Update edge information
+                std::move(e.begin(), e.end(), edges.end());
 
                 for (auto const &aHouse : housses) {
                     auto child_zpid = aHouse.zpid;
@@ -202,7 +209,7 @@ namespace zillow {
         const std::string deepCompsDatabaseFile = "deep_comps";
         const std::string updatePropertyDetailsDatabaseFile =
             "updated_property_detail";
-        const int max_housses = 1000;
+        const size_t max_housses = 100;
         utils::Writer DeepSearchWriter;
         utils::Writer DeepCompsWriter;
         utils::Writer UpdatedPropertyDetailsWriter;

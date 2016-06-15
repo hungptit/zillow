@@ -65,8 +65,17 @@ if (Boost_FOUND)
   foreach (src_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${src_file} ${src_file}.cpp)
     TARGET_LINK_LIBRARIES(${src_file}
-      ${Boost_LIBRARIES} ${LIB_LEVELDB} ${LIB_FMT} ${LIB_SNAPPY}  
-      ${LIB_POCO_NET} ${LIB_POCO_FOUNDATION} ${LIB_POCO_UTIL} ${LIB_POCO_XML}
+      ${Boost_LIBRARIES}
+      ${LIB_LEVELDB}
+      ${LIB_FMT}
+      ${LIB_SNAPPY}  
+      ${LIB_POCO_UTIL}
+      ${LIB_POCO_NET}
+      ${LIB_POCO_XML}
+      ${LIB_POCO_SQLITE}
+      ${LIB_POCO_FOUNDATION}
+      ${LIB_POCO_DATA}
+      ${LIB_POCO_SQLITE} -ldl -lpthread
       -lpthread -lrt)
   endforeach (src_file)
   INSTALL_PROGRAMS(//$ENV{HOME}/Public/sbtools FILES ${COMMAND_SRC_FILES})

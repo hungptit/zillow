@@ -21,6 +21,8 @@ int main(int argc, char **argv) {
       ("street,a", po::value<std::string>(), "Street")
       ("city,c", po::value<std::string>(),"City")
       ("state,s", po::value<std::string>(), "State")
+      ("desired-cities,t", po::value<std::vector<std::string>>(), "Desired cities.")
+      ("desired-states,b", po::value<std::vector<std::string>>(), "Desired states.")
       ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
     // clang-format on
 
@@ -39,7 +41,7 @@ int main(int argc, char **argv) {
         return false;
     }
 
-    bool verbose = vm.count("verbose");
+    // bool verbose = vm.count("verbose");
 
     std::string street;
     if (vm.count("street")) {
@@ -72,7 +74,8 @@ int main(int argc, char **argv) {
 
     {
         zillow::Crawler crawler(zwpid);
-        crawler.exec(std::make_tuple(street,0, city, state, 0.0, 0.0), 25);
+        crawler.save();
+        // crawler.exec(std::make_tuple(street,0, city, state, 0.0, 0.0), 25);
     }
    
     return 0;
