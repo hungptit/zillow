@@ -6,20 +6,16 @@
 * TODO Before query any house need to check that it information is exist in the database first. We might need to change house address to lowercase.
 * TODO How to apply machine learning algorithms to predict the sale and the area that we need to focus?
 * TODO How to import data from Redfin?
-* TODO Save all crawled data to sqlite3 and rocksdb.
+* TODO Save all crawled data to sqlite3 and leveldb. Will need to migrate to rocksdb later.
 * TODO Save all raw data to rocksdb. There are three databases which are DeepSearchResults, DeepCompsResults, and UpdatedPropertiesDetail. The key is zpid-crawl-date.
 * TODO Need to find a good C++ parser for the XML data.
 * TODO From a excel file write the output data in JSON format that can be understandable by cereal. Information will be imported to a vector of tuples.
 * TODO Only use MATLAB to do some Excel related tasks.
 * TODO How to compute the score between two houses
-* DONE Function parseAddress will return a tuple which has address information
-  CLOSED: [2016-06-09 Thu 17:30]
-* DONE Funnction parseLinks will return a tuple which has zillow links
-  CLOSED: [2016-06-09 Thu 17:30]
-* DONE Function parseZEstimate will return a tuple which has all zillow estimate information.
-  CLOSED: [2016-06-09 Thu 17:30]
-* DONE Function getDeepSearchResults will return a deep search results of a given xml_node.
-  CLOSED: [2016-06-09 Thu 17:30]
+* TODO Function parseHouseInfo will return information about a house
+* TODO parseSaleRecord will return a struct which has a sale record for a house.
+* TODO Function parseZEstimate will return a struct which has ZEstimate information.
+* TODO Function getDeepSearchResults will return a struct which has deep search results of a given xml_node.
 * TODO SaleRecord will has these information: SellerAgent, BuyerAgent, SoldDate, SoldPrice, SoldPriceCurrency, Notes (random notes collected from users)
 * TODO Houses table only have information about fact of houses such as address, links, and rooms etc.
 * TODO ZEstimate will have all zestimate information for a house.
@@ -30,4 +26,4 @@
 ** A web crawler will need to operate on the string stream. We should not create unneccesary temporary data.
 * TODO Save all raw data to DeepSearchResults, DeepCompsResults, and UpdatedDetailsResults leveldb database.
 * TODO Serialize all processed data into leveldb + sqlite databases?
-* TODO 
+* TODO Need a serialize template method for all used structure.

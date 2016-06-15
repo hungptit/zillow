@@ -132,16 +132,11 @@ namespace zillow {
         }
 
         void save() const {
-<<<<<<< HEAD
+
             // std::set<DeepSearchResults> results(vertexes.begin(),
             // vertexes.end());
             // Save to SQlite3 database.
           writeToSQLite("database.db", vertexes, edges);
-          
-            //
-=======
-            // std::set<DeepSearchResults> results(vertexes.begin(), vertexes.end());
->>>>>>> b36861eb09a85d0f637b19c1750ab89b66847f8f
         }
 
         // Will need to use BFS traversal.
