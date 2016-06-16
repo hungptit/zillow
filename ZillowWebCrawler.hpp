@@ -142,6 +142,15 @@ namespace zillow {
             traverse(count);
         }
 
+        void disp(const int verbose_level) {
+            switch (verbose_level) {
+              case 1:
+                fmt::print("Number of vertexes: {}\n", Vertexes.size());
+                fmt::print("Number of edges: {}\n", Edges.size());
+                break;
+            }
+        }
+
         void save() const {
             // Serialize all data to JSON
             std::stringstream output;
@@ -152,12 +161,9 @@ namespace zillow {
             }
             writeTextFile(output, "crawled_data.json");
 
-            // std::set<DeepSearchResults> results(vertexes.begin(),
-            // vertexes.end());
-            // Save to SQlite3 database.
+            // Write to SQLite database
             fmt::print("Number of vertexes: {0}\n", Vertexes.size());
             fmt::print("Number of edges: {0}\n", Edges.size());
-
             writeToSQLite("database.db", Vertexes, Edges);
         }
 
@@ -167,6 +173,8 @@ namespace zillow {
                 const unsigned long zpid = Queue.front();
                 Queue.pop_front();
 
+                // Debug message
+                disp(1);
                 fmt::print("zpid = {}\n", zpid);
 
                 // Get DeepComps results
@@ -177,9 +185,9 @@ namespace zillow {
                 auto results = zillow::query(queryCmd, output);
                 assert(results);
 
-                writeTextFile(output,
-                              "deepComps_" + std::to_string(zpid) + ".xml");
-
+                const std::string aKey = "deepComps-" + std::to_string(zpid);
+                NoSQLDatabaseWriter.write(aKey, output.str());
+                
                 // Parse XML data
                 fmt::print("Parse XML data obtained from this query {}\n",
                            queryCmd);
@@ -187,20 +195,23 @@ namespace zillow {
                 pugi::xml_document doc;
                 pugi::xml_parse_result parseResults = doc.load(output);
                 // assert(parseResults == pugi::status_ok);
+
                 Message message = zillow::parseMessage(
                     doc.child("Comps:comps").child("message"));
-
-                assert(message.Code == 0);
+                
                 if (message.Code) {
                     fmt::print("Error ===> Could not query this address: {}\n",
                                queryCmd);
                     std::ostringstream os;
                     print<cereal::JSONOutputArchive>(os, message);
                     fmt::print("{}\n", os.str());
-                    return;
+                    
+                    // If we could not query data for a given address then skip it.
+                    continue;
                 }
 
-                fmt::print("Parse deepComps data\n");
+                // fmt::print("Parse deepComps data\n");
+
                 std::vector<DeepSearchResults> houses;
                 std::vector<EdgeData> e;
                 std::tie(houses, e) =
@@ -208,7 +219,7 @@ namespace zillow {
                                                        .child("response")
                                                        .child("properties"));
 
-                fmt::print("Get the results\n");
+                // fmt::print("Get the results\n");
 
                 // Update vertex information
                 Visited.insert(zpid);
@@ -250,9 +261,9 @@ namespace zillow {
         std::unordered_set<IDType> HouseIDs;
 
         std::string zwpid;
-        std::string SQLiteDatabase = "database.db";
-        std::string NoSQLDatabase = "info";
-        size_t max_houses = 1000;
+        std::string SQLiteDatabase;
+        std::string NoSQLDatabase;
+        size_t max_houses;
         utils::Writer NoSQLDatabaseWriter;
     };
 }
