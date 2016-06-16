@@ -44,11 +44,11 @@ namespace zillow {
         HashTable Data;
     };
 
-    /** 
+    /**
      * This API will be used for debugging purpose.
      *
-     * @param aNode 
-     * @param prefix 
+     * @param aNode
+     * @param prefix
      */
     void dfs(pugi::xml_node aNode, const std::string &prefix) {
         for (pugi::xml_node aChild = aNode.first_child(); aChild;
@@ -82,32 +82,20 @@ namespace zillow {
      */
     Links parseLinks(const HashTable &data) {
         HashTable::const_iterator it;
-        
-        std::string homedetails;
+
         it = data.find("/links/homedetails/");
-        if (it != data.end()) {
-            homedetails = it->second;
-        }
+        std::string homedetails = (it != data.end()) ? it->second : "";
 
-        std::string graphsanddata;
         it = data.find("/links/graphsanddata/");
-        if (it != data.end()) {
-            graphanddata= it->second;
-        }
+        std::string graphsanddata = (it != data.end()) ? it->second : "";
 
-        std::string mapthishome;
         it = data.find("/links/mapthishome/");
-        if (it != data.end()) {
-            mapthishome = it->second;
-        }
+        std::string mapthishome = (it != data.end()) ? it->second : "";
 
-        std::string comparables;
         it = data.find("/links/comparables/");
-        if (it != data.end()) {
-            comparables= it->second;
-        }
+        std::string comparables = (it != data.end()) ? it->second : "";
 
-        return Links(homedetails, graphanddata, mapthishome, comparables);
+        return Links(homedetails, graphsanddata, mapthishome, comparables);
     }
 
     /**
@@ -206,8 +194,8 @@ namespace zillow {
         it = data.find("/totalRooms/");
         int totalRooms = (it != data.end()) ? std::stod(it->second) : 0;
 
-        return HouseInfo(parseAddress(data), useCode, yearBuilt, lotSizeSqFt, finishedSqFt,
-                         bathrooms, bedrooms, totalRooms);
+        return HouseInfo(parseAddress(data), useCode, yearBuilt, lotSizeSqFt,
+                         finishedSqFt, bathrooms, bedrooms, totalRooms);
     }
 
     auto parseDeepSearchResultsRequest(pugi::xml_node rootNode) {
@@ -270,8 +258,9 @@ namespace zillow {
         assert(it != data.end()); // This field must exist
         auto zpid = std::stoul(it->second);
 
-        return DeepSearchResults(zpid, parseHouseGeneralInfo(data),parseLinks(data), parseTaxInfo(data), parseSaleRecord(data),
-                                 parseZestimate(data));
+        return DeepSearchResults(zpid, parseHouseGeneralInfo(data),
+                                 parseLinks(data), parseTaxInfo(data),
+                                 parseSaleRecord(data), parseZestimate(data));
     }
 
     DeepSearchResults parseDeepSearchResultsResponse(pugi::xml_node rootNode) {
@@ -279,8 +268,7 @@ namespace zillow {
         return extractData(parser.getData());
     }
 
-    std::tuple<std::vector<DeepSearchResults>,
-               std::vector<EdgeData>>
+    std::tuple<std::vector<DeepSearchResults>, std::vector<EdgeData>>
     parseDeepCompsResponse(pugi::xml_node rootNode) {
         std::vector<DeepSearchResults> results;
         std::vector<EdgeData> edges;
@@ -299,8 +287,8 @@ namespace zillow {
             auto info = parseDeepSearchResultsResponse(aChild);
             HashTable::const_iterator it = data.find("/score");
             assert(it != data.end()); // score property must exist.
-            edges.emplace_back(EdgeData(principal_zpid, info.zpid,
-                                               std::stod(it->second)));
+            edges.emplace_back(
+                EdgeData(principal_zpid, info.zpid, std::stod(it->second)));
             results.emplace_back(std::move(info));
         }
 

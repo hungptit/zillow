@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SearchResults:searchresults xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SearchResults="http://www.zillow.com/static/xsd/SearchResults.xsd" xsi:schemaLocation="http://www.zillow.com/static/xsd/SearchResults.xsd http://www.zillowstatic.com/vstatic/baf4669/static/xsd/SearchResults.xsd">
+  <request>
+    <address>302 Warren St</address>
+    <citystatezip>Needham, MA</citystatezip>
+  </request>
+  <message>
+    <text>Request successfully processed</text>
+    <code>0</code>
+  </message>
+  <response>
+    <results>
+      <result>
+        <zpid>57474939</zpid>
+        <links>
+          <homedetails>http://www.zillow.com/homedetails/302-Warren-St-Needham-MA-02492/57474939_zpid/</homedetails>
+          <graphsanddata>http://www.zillow.com/homedetails/302-Warren-St-Needham-MA-02492/57474939_zpid/#charts-and-data</graphsanddata>
+          <mapthishome>http://www.zillow.com/homes/57474939_zpid/</mapthishome>
+          <comparables>http://www.zillow.com/homes/comps/57474939_zpid/</comparables>
+        </links>
+        <address>
+          <street>302 Warren St</street>
+          <zipcode>02492</zipcode>
+          <city>Needham</city>
+          <state>MA</state>
+          <latitude>42.274195</latitude>
+          <longitude>-71.233862</longitude>
+        </address>
+        <FIPScounty>25021</FIPScounty>
+        <useCode>SingleFamily</useCode>
+        <taxAssessmentYear>2014</taxAssessmentYear>
+        <taxAssessment>523800.0</taxAssessment>
+        <yearBuilt>1924</yearBuilt>
+        <lotSizeSqFt>6969</lotSizeSqFt>
+        <finishedSqFt>1814</finishedSqFt>
+        <bathrooms>2.0</bathrooms>
+        <bedrooms>4</bedrooms>
+        <totalRooms>8</totalRooms>
+        <lastSoldDate>06/18/2013</lastSoldDate>
+        <lastSoldPrice currency="USD">509000</lastSoldPrice>
+        <zestimate>
+          <amount currency="USD">700775</amount>
+          <last-updated>06/12/2016</last-updated>
+          <oneWeekChange deprecated="true"/>
+          <valueChange duration="30" currency="USD">11886</valueChange>
+          <valuationRange>
+            <low currency="USD">665736</low>
+            <high currency="USD">735814</high>
+          </valuationRange>
+          <percentile>0</percentile>
+        </zestimate>
+        <localRealEstate>
+          <region name="Needham" id="33039" type="city">
+            <zindexValue>789,700</zindexValue>
+            <links>
+              <overview>http://www.zillow.com/local-info/MA-Needham/r_33039/</overview>
+              <forSaleByOwner>http://www.zillow.com/needham-ma/fsbo/</forSaleByOwner>
+              <forSale>http://www.zillow.com/needham-ma/</forSale>
+            </links>
+          </region>
+        </localRealEstate>
+      </result>
+    </results>
+  </response>
+</SearchResults:searchresults>
+<!-- H:004  T:25ms  S:1206  R:Thu Jun 16 07:21:24 PDT 2016  B:5.0.30278-release_20160614_outrun.ab0f437~candidate.523a262 -->
