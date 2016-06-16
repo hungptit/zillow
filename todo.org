@@ -27,3 +27,6 @@
 * TODO Save all raw data to DeepSearchResults, DeepCompsResults, and UpdatedDetailsResults leveldb database.
 * TODO Serialize all processed data into leveldb + sqlite databases?
 * TODO Need a serialize template method for all used structure.
+
+
+CREATE VIEW DETAILS AS SELECT House.zpid, House.Street, House.City, House.State from House, Links, SaleRecord, Tax, ZEstimate WHERE House.zpid == Links.zpid AND House.zpid == SaleRecord.zpid AND House.zpid == Tax.zpid AND House.zpid == ZEstimate.zpid

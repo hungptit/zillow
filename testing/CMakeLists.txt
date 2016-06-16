@@ -7,11 +7,11 @@ set(CMAKE_BUILD_TYPE Debug)
 # set (CMAKE_BUILD_TYPE Release)
 
 # Uncomment below lines if using gcc
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic")
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic")
 
 # Uncomment below lines if using clang
-# set(CMAKE_CXX_COMPILER "${PROJECTS_FOLDER}3p/llvm/bin/clang++")
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic -O3 -Wno-deprecated-register -Wno-keyword-macro -Wno-unused-local-typedef")
+set(CMAKE_CXX_COMPILER "${PROJECTS_FOLDER}3p/llvm/bin/clang++")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -pedantic -O3 -Wno-deprecated-register -Wno-keyword-macro -Wno-unused-local-typedef")
 
 ENABLE_TESTING()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -35,7 +35,7 @@ endif (Boost_NO_SYSTEM_PATHS)
 
 message(${BOOST_ROOT})
 
-find_package(Boost 1.60 REQUIRED regex date_time system filesystem thread graph program_options iostreams)
+find_package(Boost 1.60 REQUIRED date_time system filesystem thread graph program_options iostreams)
 
 # Include folder
 message(${PROJECTS_FOLDER})
