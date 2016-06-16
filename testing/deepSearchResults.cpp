@@ -98,8 +98,11 @@ int main(int argc, char **argv) {
 
             auto message = zillow::parseMessage(
                 doc.child("SearchResults:searchresults").child("message"));
-            fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
-                       std::get<1>(message));
+            {
+                std::ostringstream os;
+                zillow::print<cereal::JSONOutputArchive>(os, message);
+                fmt::print("{}\n", os.str());
+            }
 
             auto response = zillow::parseDeepSearchResultsResponse(
                 doc.child("SearchResults:searchresults")

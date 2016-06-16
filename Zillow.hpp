@@ -194,6 +194,11 @@ namespace zillow {
             : Text(text), Code(code) {}
         std::string Text;
         int Code;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("Text", Text),
+               cereal::make_nvp("Code", Code));
+        }
     };
 
     struct DeepSearchResults {

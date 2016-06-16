@@ -16,14 +16,15 @@ int main(int argc, char **argv) {
 
     // clang-format off
     desc.add_options()
-      ("help,h", "This command will query information for a house using zillow DeepSearch API.")
-      ("verbose,v", "Display verbose information.")
-      ("street,a", po::value<std::string>(), "Street")
-      ("city,c", po::value<std::string>(),"City")
-      ("state,s", po::value<std::string>(), "State")
-      ("desired-cities,t", po::value<std::vector<std::string>>(), "Desired cities.")
-      ("desired-states,b", po::value<std::vector<std::string>>(), "Desired states.")
-      ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
+        ("help,h", "This command will query information for a house using zillow DeepSearch API.")
+        ("verbose,v", "Display verbose information.")
+        ("street,a", po::value<std::string>(), "Street")
+        ("city,c", po::value<std::string>(),"City")
+        ("state,s", po::value<std::string>(), "State")
+        ("max-house,m", po::value<size_t>(), "Street")
+        ("desired-cities,t", po::value<std::vector<std::string>>(), "Desired cities.")
+        ("desired-states,b", po::value<std::vector<std::string>>(), "Desired states.")
+        ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
     // clang-format on
 
     po::positional_options_description p;
@@ -39,6 +40,11 @@ int main(int argc, char **argv) {
     if (vm.count("help")) {
         std::cout << desc;
         return false;
+    }
+
+    size_t max_houses = 1000;
+    if (vm.count("max-house")) {
+        max_houses = vm["street"].as<size_t>();
     }
 
     // bool verbose = vm.count("verbose");
@@ -73,10 +79,10 @@ int main(int argc, char **argv) {
     }
 
     {
-        zillow::Crawler crawler(zwpid);
+        zillow::Crawler crawler(zwpid, max_houses);
+        crawler.exec(zillow::Address(street, 0, city, state, 0.0, 0.0), 25);
         crawler.save();
-        // crawler.exec(std::make_tuple(street,0, city, state, 0.0, 0.0), 25);
     }
-   
+
     return 0;
 }

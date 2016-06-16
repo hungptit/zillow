@@ -31,6 +31,11 @@ namespace zillow {
         Poco::Data::SQLite::Connector::registerConnector();
         Session session("SQLite", dataFile);
 
+        // Return if either vertexes or edges are empty.
+        if (vertexes.empty() || edges.empty()) {
+            return;
+        }
+
         /**
          * Create HouseInfo, SaleRecord, ZEstimate, Links, and Edges tables.
          *

@@ -49,5 +49,12 @@ namespace zillow {
         OArchive oar(output);
         oar(cereal::make_nvp("Edges", data));
     }
+
+    template <typename OArchive, typename OutputStream>
+    void print(OutputStream &output,
+               const Message &data) {
+        OArchive oar(output);
+        oar(cereal::make_nvp("Message", data));
+    }
 }
 #endif
