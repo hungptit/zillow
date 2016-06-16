@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
     desc.add_options()
       ("help,h", "This command will query information for a house using zillow DeepSearch API.")
       ("verbose,v", "Display verbose information.")
+      ("output-to-xml,x", "Output a raw crawled data to a XML file")
       ("street,a", po::value<std::string>(), "Street")
       ("city,c", po::value<std::string>(),"City")
       ("state,s", po::value<std::string>(), "State")
@@ -77,12 +78,17 @@ int main(int argc, char **argv) {
 
     std::stringstream output;
     bool status = zillow::query(queryCmd, output);
+
+    if (vm.count("output-to-xml")) {
+      zillow::writeTextFile(output, "deepSearchResults.xml");
+    }
+    
     if (!status) {
         fmt::print("Cannot query this link: {}", queryCmd);
     } else {
         pugi::xml_document doc;
         pugi::xml_parse_result parseResults = doc.load(output);
-        assert(parseResults == pugi::status_ok);
+        // assert(parseResults == pugi::status_ok);
 
         {
             auto request = zillow::parseDeepSearchResultsRequest(
@@ -92,8 +98,11 @@ int main(int argc, char **argv) {
 
             auto message = zillow::parseMessage(
                 doc.child("SearchResults:searchresults").child("message"));
-            fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
-                       std::get<1>(message));
+            {
+                std::ostringstream os;
+                zillow::print<cereal::JSONOutputArchive>(os, message);
+                fmt::print("{}\n", os.str());
+            }
 
             auto response = zillow::parseDeepSearchResultsResponse(
                 doc.child("SearchResults:searchresults")

@@ -15,7 +15,6 @@ int main(int argc, char **argv) {
         ("help,h", "This command will query information for a house using zillow DeepSearch API.")
       ("verbose,v", "Display verbose information.")
       ("zpid,z", po::value<size_t>(), "Zillow house ID")
-      ("count,c", po::value<size_t>(), "")
       ("zwpid,w", po::value<std::string>(), "Zillow house ID");
     // clang-format on
 
@@ -42,11 +41,6 @@ int main(int argc, char **argv) {
     } else {
         std::cerr << "You need to provide zpid of a house\n";
         return 1;
-    }
-
-    size_t count = 25;
-    if (vm.count("count")) {
-        count = vm["count"].as<size_t>();
     }
 
     std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";

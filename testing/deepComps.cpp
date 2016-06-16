@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     desc.add_options()
         ("help,h", "This command will query information for a house using zillow DeepSearch API.")
       ("verbose,v", "Display verbose information.")
+      ("output-to-xml,x", "Output a raw crawled data to a XML file")
       ("zpid,z", po::value<size_t>(), "Zillow house ID")
       ("count,c", po::value<size_t>(), "")
       ("zwpid,w", po::value<std::string>(), "Zillow web ID");
@@ -62,6 +63,10 @@ int main(int argc, char **argv) {
     std::stringstream output;
     auto results = zillow::query(queryCmd, output);
 
+    if (vm.count("output-to-xml")) {
+      zillow::writeTextFile(output, "deepCompsResults.xml");
+    }
+    
     if (results) {        
         fmt::print("{}\n", output.str());
     } else {

@@ -23,8 +23,11 @@ void parseDeepSearchResults() {
 
     auto message = zillow::parseMessage(
         doc.child("SearchResults:searchresults").child("message"));
-    fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
-               std::get<1>(message));
+    {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, message);
+        fmt::print("{}\n", os.str());
+    }
 
     auto response = zillow::parseDeepSearchResultsResponse(
         doc.child("SearchResults:searchresults")
@@ -57,16 +60,19 @@ void parseDeepCompsResults() {
 
     auto message =
         zillow::parseMessage(doc.child("Comps:comps").child("message"));
-    fmt::print("message: \n\ttext: {0}\n\tcode : {1}\n", std::get<0>(message),
-               std::get<1>(message));
+    {
+        std::ostringstream os;
+        zillow::print<cereal::JSONOutputArchive>(os, message);
+        fmt::print("{}\n", os.str());
+    }
 
     // zillow::dfs(rootNode.child("response").child("properties"), "");
     auto results = zillow::parseDeepCompsResponse(
         doc.child("Comps:comps").child("response").child("properties"));
 
     // const zillow::DeepSearchResults &principal = std::get<0>(results);
-    auto const &deepComps = std::get<1>(results);
-    auto const &edges = std::get<2>(results);
+    auto const &deepComps = std::get<0>(results);
+    auto const &edges = std::get<1>(results);
 
     fmt::print("Number of comps element: {}\n", deepComps.size());
     for (auto const &item : deepComps) {

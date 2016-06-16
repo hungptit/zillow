@@ -227,7 +227,7 @@ namespace zillow {
                                std::stoi(data.find("/count/")->second));
     }
 
-    auto parseMessage(pugi::xml_node rootNode) {
+    Message parseMessage(pugi::xml_node rootNode) {
         NodeParser parser(rootNode);
         auto const &data = parser.getData();
         assert(data.size() == 2);
@@ -235,7 +235,7 @@ namespace zillow {
         auto const codeIter = data.find("/code/");
         assert(textIter != data.end());
         assert(codeIter != data.end());
-        return std::make_tuple(textIter->second, std::stoi(codeIter->second));
+        return Message(textIter->second, std::stoi(codeIter->second));
     }
 
     bool validateData(const HashTable &data) {
@@ -279,7 +279,7 @@ namespace zillow {
         return extractData(parser.getData());
     }
 
-    std::tuple<DeepSearchResults, std::vector<DeepSearchResults>,
+    std::tuple<std::vector<DeepSearchResults>,
                std::vector<EdgeData>>
     parseDeepCompsResponse(pugi::xml_node rootNode) {
         std::vector<DeepSearchResults> results;
@@ -305,7 +305,7 @@ namespace zillow {
         }
 
         // Return
-        return std::make_tuple(principal, results, edges);
+        return std::make_tuple(results, edges);
     }
 }
 

@@ -62,6 +62,7 @@ namespace zillow {
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("street", Street),
+               cereal::make_nvp("zipcode", ZipCode),
                cereal::make_nvp("city", City), cereal::make_nvp("state", State),
                cereal::make_nvp("latitude", Latitude),
                cereal::make_nvp("longitude", Longitude));
@@ -94,8 +95,9 @@ namespace zillow {
             : Amount(), Low(), High(), Currency("USB"),
               LastUpdated("01/01/1990"){};
 
-        explicit ZEstimate(Real amount, Real low,
-                           Real high, const std::string &currency, const std::string &last_updated)
+        explicit ZEstimate(Real amount, Real low, Real high,
+                           const std::string &currency,
+                           const std::string &last_updated)
             : Amount(amount), Low(low), High(high), Currency(currency),
               LastUpdated(last_updated) {}
         Real Amount;
@@ -192,6 +194,11 @@ namespace zillow {
             : Text(text), Code(code) {}
         std::string Text;
         int Code;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("Text", Text),
+               cereal::make_nvp("Code", Code));
+        }
     };
 
     struct DeepSearchResults {
