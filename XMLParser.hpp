@@ -81,10 +81,33 @@ namespace zillow {
      * @return
      */
     Links parseLinks(const HashTable &data) {
-        return Links(data.find("/links/homedetails/")->second,
-                     data.find("/links/graphsanddata/")->second,
-                     data.find("/links/mapthishome/")->second,
-                     data.find("/links/comparables/")->second);
+        HashTable::const_iterator it;
+        
+        std::string homedetails;
+        it = data.find("/links/homedetails/");
+        if (it != data.end()) {
+            homedetails = it->second;
+        }
+
+        std::string graphsanddata;
+        it = data.find("/links/graphsanddata/");
+        if (it != data.end()) {
+            graphanddata= it->second;
+        }
+
+        std::string mapthishome;
+        it = data.find("/links/mapthishome/");
+        if (it != data.end()) {
+            mapthishome = it->second;
+        }
+
+        std::string comparables;
+        it = data.find("/links/comparables/");
+        if (it != data.end()) {
+            comparables= it->second;
+        }
+
+        return Links(homedetails, graphanddata, mapthishome, comparables);
     }
 
     /**
