@@ -32,19 +32,19 @@ namespace zillow {
         Session session("SQLite", dataFile);
 
         // Create HouseInfo, SaleRecord, ZEstimate, and Edges tables.
-        session << "CREATE TABLE IF NOT EXISTS House (BIGINT zpid NOT NULL "
-                   "UNIQUE, street VARCHAR(128), city "
-                   "VARCHAR(64) NOT NULL, state VARCHAR(3) NOT NULL)",
+        // clang-format off
+        session << "CREATE TABLE IF NOT EXISTS House (zpid BIGINT NOT NULL UNIQUE, Street VARCHAR(128), City VARCHAR(64) NOT NULL, State VARCHAR(3) NOT NULL)",
             now;
 
-        session
-            << "CREATE TABLE Edges (BIGINT src_id NOT NULL, BIGINT dst_id NOT NULL, REAL score NOT NULL)",
+        session << "CREATE TABLE IF NOT EXISTS Tax (BIGINT zpid NOT NULL UNIQUE, TaxAssessmentYear INT, TaxAssessment REAL)",
             now;
 
+        session << "CREATE TABLE  IF NOT EXISTS Edges (SrcId BIGINT NOT NULL, DstId BIGINT NOT NULL, Score REAL NOT NULL)",
+            now;
+
+        // clang-format on
         // Update House table.
-        {
-            
-        }
+        {}
         // // Update SaleRecord table
         // {
         //     session
@@ -62,9 +62,11 @@ namespace zillow {
         //     for (auto const &item : vertexes) {
         //         data.emplace_back(SaleRecordRow(
         //             item.zpid, item.saleRecord.LastSoldDate,
-        //             item.saleRecord.LastSoldPrice, item.saleRecord.Currency));
+        //             item.saleRecord.LastSoldPrice,
+        //             item.saleRecord.Currency));
         //     }
-        //     insert << "INSERT INTO SaleRecord VALUES (?, ?, ?, ?)", use(data);
+        //     insert << "INSERT INTO SaleRecord VALUES (?, ?, ?, ?)",
+        //     use(data);
         //     insert.execute();
         // }
 
@@ -91,10 +93,6 @@ namespace zillow {
 
         // // Update Tax table
         // {
-        //     session
-        //         << "CREATE TABLE IF NOT EXISTS Tax (BIGINT zpid NOT "
-        //            "NULL UNIQUE, TaxAssessmentYear INT, TaxAssessment REAL)",
-        //         now;
         //     Statement insert(session);
 
         //     // Get an std::vector of Poco::Tuple
@@ -111,14 +109,14 @@ namespace zillow {
         // }
 
         // Update Edges table
-        {                       
-
+        {
             // Get an std::vector of Poco::Tuple
             using EdgesRow = Poco::Tuple<IDType, IDType, double>;
             std::vector<EdgesRow> data;
             data.reserve(edges.size());
             for (auto const &item : edges) {
-                data.emplace_back(EdgesRow(item.SrcID, item.DstID, item.Score));
+                data.emplace_back(EdgesRow(item.SrcID, item.DstID,
+                item.Score));
             }
             // Insert edge information into the Edges table
 
