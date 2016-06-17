@@ -1,24 +1,14 @@
-* TODO Create the database for house and update information.
 * TODO Setup a cron job which will crawl house information daily from zillow.com.
 * TODO Have a C++ client which allow users to add zpid to the database i.e add_house_zpid.
-* TODO A script which can compile the latest version of sqlitebrowser.
 * TODO Web interface which can produce a reasonable report.
 * TODO Before query any house need to check that it information is exist in the database first. We might need to change house address to lowercase.
 * TODO How to apply machine learning algorithms to predict the sale and the area that we need to focus?
 * TODO How to import data from Redfin?
-* TODO Save all crawled data to sqlite3 and leveldb. Will need to migrate to rocksdb later.
 * TODO Save all raw data to rocksdb. There are three databases which are DeepSearchResults, DeepCompsResults, and UpdatedPropertiesDetail. The key is zpid-crawl-date.
-* TODO Need to find a good C++ parser for the XML data.
 * TODO From a excel file write the output data in JSON format that can be understandable by cereal. Information will be imported to a vector of tuples.
 * TODO Only use MATLAB to do some Excel related tasks.
 * TODO How to compute the score between two houses
-* TODO Function parseHouseInfo will return information about a house
-* TODO parseSaleRecord will return a struct which has a sale record for a house.
-* TODO Function parseZEstimate will return a struct which has ZEstimate information.
-* TODO Function getDeepSearchResults will return a struct which has deep search results of a given xml_node.
 * TODO SaleRecord will has these information: SellerAgent, BuyerAgent, SoldDate, SoldPrice, SoldPriceCurrency, Notes (random notes collected from users)
-* TODO Houses table only have information about fact of houses such as address, links, and rooms etc.
-* TODO ZEstimate will have all zestimate information for a house.
 * TODO Have a undirected weighted graph data structure to store DeepComps results.
 * TODO Write a mobile app that can give users information related to a house and/or area. It also give users pleminary advice about buying a house for living and/or investment.
 * TODO A client which can automatically crawl all house information related to a given house must be in the same town?
@@ -26,7 +16,8 @@
 ** A web crawler will need to operate on the string stream. We should not create unneccesary temporary data.
 * TODO Save all raw data to DeepSearchResults, DeepCompsResults, and UpdatedDetailsResults leveldb database.
 * TODO Serialize all processed data into leveldb + sqlite databases?
-* TODO Need a serialize template method for all used structure.
-
-
-CREATE VIEW DETAILS AS SELECT House.zpid, House.Street, House.City, House.State from House, Links, SaleRecord, Tax, ZEstimate WHERE House.zpid == Links.zpid AND House.zpid == SaleRecord.zpid AND House.zpid == Tax.zpid AND House.zpid == ZEstimate.zpid
+* TODO SaleRecord: Need to add seller and buyer agents plus the crawled time and notes.
+* TODO House: Need to add the time stamp.
+* TODO Edges: Need to add the time stamp.
+* TODO ZEstimate: Need to add  the time stamp.
+* TODO We will saved all raw data to leveldb and save all processed data to both leveldb and sqlite. We might need to reprocess the raw data to update all databases.

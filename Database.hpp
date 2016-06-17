@@ -40,6 +40,8 @@ namespace zillow {
          * Create HouseInfo, SaleRecord, ZEstimate, Links, and Edges tables.
          *
          */
+
+        fmt::print("Create tables\n");
         // (zpid, Street, ZipCode, City, State, Latitude, Longitude,
         // UseCode, YearBuilt, LotSizeSqFt, FinishedSqFt, Bathrooms,
         // Bedrooms, TotalRooms)
@@ -77,6 +79,7 @@ namespace zillow {
 
         // Update House table.
         {
+            fmt::print("Create House table\n");
             Statement insert(session);
 
             // Get an std::vector of Poco::Tuple
@@ -107,6 +110,7 @@ namespace zillow {
 
         // Update SaleRecord table
         {
+            fmt::print("Create SaleRecord table\n");
             Statement insert(session);
 
             // Get an std::vector of Poco::Tuple
@@ -124,6 +128,7 @@ namespace zillow {
 
         // Update ZEstimate table
         {
+            fmt::print("Create ZEstimate table\n");
             Statement insert(session);
 
             // Get an std::vector of Poco::Tuple
@@ -144,6 +149,7 @@ namespace zillow {
 
         // Update Tax table
         {
+            fmt::print("Create Tax table\n");
             using Row = Poco::Tuple<IDType, int, double>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
@@ -159,6 +165,7 @@ namespace zillow {
 
         // Update Edges table
         {
+            fmt::print("Create Edges table\n");
             using Row = Poco::Tuple<IDType, IDType, double>;
             std::vector<Row> data;
             data.reserve(edges.size());
@@ -174,6 +181,7 @@ namespace zillow {
 
         // Update Links table
         {
+            fmt::print("Create Links table\n");
             using Row = Poco::Tuple<IDType, std::string, std::string,
                                     std::string, std::string>;
             std::vector<Row> data;
@@ -191,33 +199,48 @@ namespace zillow {
 
         // Create views
         {
-            Statement views(session);
-            views << "CREATE VIEW DETAILS AS SELECT House.Street, "
-                     "House.City, House.State, House.YearBuilt, "
-                     "House.LotSizeSqFt, House.FinishedSqFt, House.Bathrooms, "
-                     "House.Bedrooms, House.TotalRooms, "
-                     "SaleRecord.LastSoldDate, SaleRecord.LastSoldPrice, "
-                     "Tax.TaxAssessmentYear, Tax.TaxAssessment, "
-                     " Links.HomeDetails FROM "
-                     "House, Links, SaleRecord, "
-                     "Tax, "
-                     "ZEstimate WHERE House.zpid == Links.zpid AND House.zpid "
-                     "== SaleRecord.zpid AND "
-                     "House.zpid == Tax.zpid AND House.zpid == ZEstimate.zpid";
+            fmt::print("Create all views\n");
+            {
+                Statement views(session);
+                views << "CREATE VIEW DETAILS AS SELECT House.Street, "
+                         "House.City, House.State, House.YearBuilt, "
+                         "House.LotSizeSqFt, House.FinishedSqFt, "
+                         "House.Bathrooms, "
+                         "House.Bedrooms, House.TotalRooms, "
+                         "SaleRecord.LastSoldDate, SaleRecord.LastSoldPrice, "
+                         "Tax.TaxAssessmentYear, Tax.TaxAssessment, "
+                         " Links.HomeDetails FROM "
+                         "House, Links, SaleRecord, "
+                         "Tax, "
+                         "ZEstimate WHERE House.zpid == Links.zpid AND "
+                         "House.zpid "
+                         "== SaleRecord.zpid AND "
+                         "House.zpid == Tax.zpid AND House.zpid == "
+                         "ZEstimate.zpid";
 
-            views << "CREATE VIEW BriefView AS SELECT House.Street, "
-                     "House.City, House.State, House.YearBuilt, "
-                     "House.LotSizeSqFt, House.FinishedSqFt, House.Bathrooms, "
-                     "House.Bedrooms, House.TotalRooms, "
-                     "SaleRecord.LastSoldDate, SaleRecord.LastSoldPrice, "
-                     "Tax.TaxAssessmentYear, Tax.TaxAssessment FROM "
-                     "House, Links, SaleRecord, "
-                     "Tax, "
-                     "ZEstimate WHERE House.zpid == Links.zpid AND House.zpid "
-                     "== SaleRecord.zpid AND "
-                     "House.zpid == Tax.zpid AND House.zpid == ZEstimate.zpid";
+                views.execute();
+            }
 
-            views.execute();
+            {
+                Statement views(session);
+                views << "CREATE VIEW Brief AS SELECT House.Street, "
+                    "House.City, House.State, House.YearBuilt, "
+                    "House.LotSizeSqFt, House.FinishedSqFt, "
+                    "House.Bathrooms, "
+                    "House.Bedrooms, House.TotalRooms, "
+                    "SaleRecord.LastSoldDate, SaleRecord.LastSoldPrice, "
+                    "Tax.TaxAssessmentYear, Tax.TaxAssessment, "
+                    " Links.HomeDetails FROM "
+                    "House, Links, SaleRecord, "
+                    "Tax, "
+                    "ZEstimate WHERE House.zpid == Links.zpid AND "
+                    "House.zpid "
+                    "== SaleRecord.zpid AND "
+                    "House.zpid == Tax.zpid AND House.zpid == "
+                    "ZEstimate.zpid";
+
+                views.execute();
+            }
         }
     }
 
