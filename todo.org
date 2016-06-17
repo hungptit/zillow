@@ -21,3 +21,12 @@
 * TODO Edges: Need to add the time stamp.
 * TODO ZEstimate: Need to add  the time stamp.
 * TODO We will saved all raw data to leveldb and save all processed data to both leveldb and sqlite. We might need to reprocess the raw data to update all databases.
+* TODO Have a parser for the UpdatedPropertyDetails data.
+* TODO Have the final design for a web crawler that can
+** Craw data automatically based on the suggested house.
+** Automatically update house detail information in a separate thread using UpdatedPropertyDetails API.
+** Automatically fix or update house information using DeepSearchResults API in a separate thread.
+** Automatically update the SQLite and leveldb database.
+** Must be thread safe and need to have high performance.
+** Can comunicate with the client -> get seed and some special commands such as update date for a given town.
+** Can crawl data for a given town (limit the solution space -> save query count).

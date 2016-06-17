@@ -20,3 +20,9 @@
 * Feed electrical code, plumbing code, and building code to the elasticsearch engine 
     * Expose these information in the mynewhome domain using javascript.
     * Use deep learning algorithms to improve the search results.
+
+## Collect data automatically ##
+* Add time stamp to all item for House, SaleRecord, Tax, ZEstimate, and Edges tables
+* When crawling
+** If a house is not exist then call UpdatedPropertyDetail + DeepSearchResults to get all information about this house. Three APIs will use different **zwid**. Updated property details and deepSearchResults will be executed in separate async threads.
+** 

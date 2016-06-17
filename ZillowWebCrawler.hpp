@@ -84,6 +84,12 @@ namespace zillow {
                std::to_string(count);
     }
 
+    std::string generateUpdatedPropertyDetailsQuery(const std::string &zwpid,
+                                       const long zpid) {
+        return "http://www.zillow.com/webservice/GetUpdatedPropertyDetails.htm?zws-id=" +
+               zwpid + "&zpid=" + std::to_string(zpid);
+    }
+
     // Craw all related data for a given house using DFS algorithms.
     class Crawler {
       public:

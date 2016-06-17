@@ -42,9 +42,9 @@ int main(int argc, char **argv) {
         return false;
     }
 
-    size_t max_houses = 1000;
+    size_t max_houses = 100;
     if (vm.count("max-house")) {
-        max_houses = vm["street"].as<size_t>();
+        max_houses = vm["max-house"].as<size_t>();
     }
 
     // bool verbose = vm.count("verbose");
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";
+    std::string zwpid = zillow::ZWSID::ID2;
     if (vm.count("zwpid")) {
         zwpid = vm["zwpid"].as<std::string>();
     }

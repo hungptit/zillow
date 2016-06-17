@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";
+    std::string zwpid = zillow::ZWSID::ID1;
     if (vm.count("zwpid")) {
         zwpid = vm["zwpid"].as<std::string>();
     }   

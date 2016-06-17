@@ -28,6 +28,14 @@
 #include "cereal/types/vector.hpp"
 
 namespace zillow {
+    struct ZWSID {
+        static const std::string ID1;
+        static const std::string ID2;
+    };
+    
+    const std::string ZWSID::ID1 = "X1-ZWz1fbpbq5pogb_3wguv";
+    const std::string ZWSID::ID2 = "X1-ZWz1f8wdb88lxn_1y8f9";
+    
     using IDType = unsigned int;
     using HashTable = std::unordered_map<std::string, std::string>;
     using Real = double;

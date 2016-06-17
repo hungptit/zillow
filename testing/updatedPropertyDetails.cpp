@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
         ("help,h", "This command will query information for a house using zillow DeepSearch API.")
       ("verbose,v", "Display verbose information.")
       ("zpid,z", po::value<size_t>(), "Zillow house ID")
-      ("zwpid,w", po::value<std::string>(), "Zillow house ID");
+      ("zwpid,w", po::value<std::string>(), "Zillow web service ID");
     // clang-format on
 
     po::positional_options_description p;
@@ -43,27 +43,22 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string zwpid = "X1-ZWz1f8wdb88lxn_1y8f9";
+    std::string zwpid = zillow::ZWSID::ID1;
     if (vm.count("zwpid")) {
         zwpid = vm["zwpid"].as<std::string>();
     }
 
-    fmt::MemoryWriter input;
-    input << "http://www.zillow.com/webservice/"
-             "GetUpdatedPropertyDetails.htm?zws-id="
-          << zwpid << "&"
-          << "&zpid=" << zpid;
-
+    std::string queryCmd = zillow::generateUpdatedPropertyDetailsQuery(zwpid, zpid);
     if (verbose) {
-        fmt::print("Query link: {}\n", input.str());
+        fmt::print("Query link: {}\n", queryCmd);
     }
 
     std::stringstream output;
-    auto results = zillow::query(input.str(), output);
+    auto results = zillow::query(queryCmd, output);
     if (results) {
         fmt::print("{}\n", output.str());
     } else {
-        fmt::print("Could query this link: {}\n", input.str());
+        fmt::print("Could query this link: {}\n", queryCmd);
     }
 
     return 0;

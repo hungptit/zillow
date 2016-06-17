@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UpdatedPropertyDetails:updatedPropertyDetails xmlns:UpdatedPropertyDetails="http://www.zillow.com/static/xsd/UpdatedPropertyDetails.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.zillow.com/static/xsd/UpdatedPropertyDetails.xsd http://www.zillowstatic.com/vstatic/4e2f60e/static/xsd/UpdatedPropertyDetails.xsd">
+  <request>
+    <zpid>57477487</zpid>
+  </request>
+  <message>
+    <text>Request successfully processed</text>
+    <code>0</code>
+  </message>
+  <response>
+    <zpid>57477487</zpid>
+    <pageViewCount>
+      <currentMonth>3191</currentMonth>
+      <total>3191</total>
+    </pageViewCount>
+    <address>
+      <street>99 Wellesley Ave</street>
+      <zipcode>02494</zipcode>
+      <city>Needham</city>
+      <state>MA</state>
+      <latitude>42.30685</latitude>
+      <longitude>-71.241352</longitude>
+    </address>
+    <links>
+      <homeDetails>http://www.zillow.com/homedetails/99-Wellesley-Ave-Needham-MA-02494/57477487_zpid/</homeDetails>
+      <photoGallery>http://www.zillow.com/homedetails/99-Wellesley-Ave-Needham-MA-02494/57477487_zpid/#image=lightbox%3Dtrue</photoGallery>
+      <homeInfo>http://www.zillow.com/homedetails/99-Wellesley-Ave-Needham-MA-02494/57477487_zpid/</homeInfo>
+    </links>
+    <images>
+      <count>7</count>
+      <image>
+        <url>http://photos2.zillowstatic.com/p_d/ISt8q63kwybkyn1000000000.jpg</url>
+        <url>http://photos2.zillowstatic.com/p_d/IS52x0e24gnhtv1000000000.jpg</url>
+        <url>http://photos1.zillowstatic.com/p_d/ISd8vh5wmxd6nv1000000000.jpg</url>
+        <url>http://photos3.zillowstatic.com/p_d/ISxvuovvz7fktv1000000000.jpg</url>
+        <url>http://photos2.zillowstatic.com/p_d/IS52t5npip59nv1000000000.jpg</url>
+      </image>
+    </images>
+    <editedFacts>
+      <useCode>SingleFamily</useCode>
+      <bedrooms>4</bedrooms>
+      <bathrooms>2.0</bathrooms>
+      <finishedSqFt>1638</finishedSqFt>
+      <lotSizeSqFt>17424</lotSizeSqFt>
+      <yearBuilt>1952</yearBuilt>
+      <numRooms>7</numRooms>
+      <appliances>Dryer, Dishwasher, Refrigerator, Range / Oven, Garbage disposal, Washer</appliances>
+    </editedFacts>
+    <homeDescription>Lots of options for this bright single family in a convenient location. 10.5 miles to Boston.  Minutes to Mass pike,128 and Route 9.  Roof - 5 years old with water shield membrane, 5 year old heating system, new radiators and heating pipes.  4 bedroom 2 baths with additional room on second floor for bedroom or storage.  Walk out full basement with washer,dryer and play room.   Entertaining is easy on the deck overlooking  private yard.  Updated kitchen appliances.  Hardwood floors. Eliot school close by. Peaceful walking trails behind this large property.  **Conventional financing will not work for this property** Bring an offer, seller is motivated.</homeDescription>
+  </response>
+</UpdatedPropertyDetails:updatedPropertyDetails>
+<!-- H:003  T:241ms  S:740  R:Fri Jun 17 13:58:16 PDT 2016  B:5.0.30281-master.bd72542~hotfix_pre.a7e02e0 -->
