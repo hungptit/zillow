@@ -12,7 +12,7 @@
 void parseDeepSearchResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
-        doc.load_file("deepSearchResults.xml");
+        doc.load_file("deepSearchResults.xml", pugi::parse_full);
 
     // assert(parseResults == pugi::status_ok);
 
@@ -46,6 +46,21 @@ void parseDeepSearchResults() {
         zillow::print<cereal::JSONOutputArchive>(os, response);
         zillow::print<cereal::XMLOutputArchive>(os, response);
         fmt::print("{}\n", os.str());
+    }
+
+    {
+        zillow::NodeParser parser(doc);
+        auto const &data = parser.getData();
+        for (auto item : data) {
+            fmt::print("{0} - {1}\n", item.first, item.second);
+        }
+
+        for (auto const & item : parser.getComments()) {
+          fmt::print("Comment: {}\n", item);
+        }
+
+        std::string timeStr = zillow::getTimeStamp(parser.getComments());
+        fmt::print("Time stamp: {}\n", timeStr);
     }
 }
 
@@ -112,7 +127,7 @@ int main() {
     //           << "\n";
 
     parseDeepSearchResults();
-    parseDeepCompsResults();
+    // parseDeepCompsResults();
 
     return 0;
 }

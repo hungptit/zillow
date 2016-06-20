@@ -12,11 +12,29 @@
 #include "Zillow.hpp"
 
 namespace zillow {
+  std::string getTimeStamp(const std::vector<std::string> &comments) {
+        for (auto const &item : comments) {
+            auto start = item.find(":R");
+            if (start == std::string::npos)
+              {continue;}
+
+            auto stop = item.find("B:");
+            if (stop == std::string::npos)
+              {                continue;}
+
+            fmt::print("start = {0} and stop = {1}\n", start, stop);
+            return std::string(item.substr(start+2, stop - 1))
+              ;
+        }
+        return "";
+    }
+
     class NodeParser {
       public:
         explicit NodeParser(pugi::xml_node root) { traverse(root, ""); }
 
-        const HashTable getData() const { return Data; }
+        const HashTable &getData() const { return Data; }
+        const std::vector<std::string> &getComments() const { return Comments; }
 
       private:
         void traverse(pugi::xml_node root, const std::string &prefix) {
@@ -28,6 +46,8 @@ namespace zillow {
                                                            // cannot handle
                                                            // duplicated key.
                     Data[aKey] = aChild.value();
+                } else if (aChild.type() == pugi::node_comment) {
+                    Comments.emplace_back(aChild.value());
                 } else {
                     traverse(aChild, aKey);
                 }
@@ -39,9 +59,12 @@ namespace zillow {
                 std::string aKey = prefix + "/" + aChild.name();
                 Data[aKey] = aChild.value();
             }
+
+            // Get all comments for this node
         }
 
         HashTable Data;
+        std::vector<std::string> Comments;
     };
 
     /**

@@ -78,11 +78,21 @@ int main(int argc, char **argv) {
         zwpid = vm["zwpid"].as<std::string>();
     }
 
+    std::vector<std::string> desiredCities;
+    if (vm.count("--desired-cities")) {
+      desiredCities= vm["desired-cities"].as<std::vector<std::string>>();
+    }
+        
+    std::vector<std::string> desiredStates;
+    if (vm.count("--desired-state")) {
+      desiredStates= vm["desired-state"].as<std::vector<std::string>>();
+    }
+
     {
         zillow::Crawler crawler(zwpid, max_houses);
         crawler.exec(zillow::Address(street, 0, city, state, 0.0, 0.0), 25);
         crawler.save();
     }
-
+    
     return 0;
 }
