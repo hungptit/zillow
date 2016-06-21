@@ -69,15 +69,10 @@ void parseDeepSearchResults() {
         }
 
         fmt::print("TimeStamp: {}\n", parser.getTimeStamp());
-        //        std::tm t;
-        // std::get_time(&t, "%a %b %d %H:%M:%S %Y");
-
-        {
-            struct std::tm tm;
-            std::istringstream ss("16:35:12");
-            ss >> std::get_time(&tm, "%H:%M:%S"); // or just %T in this case
-            std::time_t time = mktime(tm);
-        }
+        // auto t = zillow::to_tm(parser.getTimeStamp());
+        // auto results = std::put_time(&t, "%c");
+        // fmt::print("Parsed time {}", std::string(results));
+        // // std::cout << "Parsed time: " << std::put_time(&t, "%c") << "\n";
     }
 }
 

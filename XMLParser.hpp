@@ -48,14 +48,20 @@ namespace zillow {
         return aComment.substr(begin, len);
     }
 
+    std::tm to_tm(const std::string &timeStr) {
+        std::istringstream ss(timeStr);
+        std::tm t = {};
+        ss >> std::get_time(&t, "%a %b %d %H:%M:%S PDT %Y");
+        assert(!ss.fail()); // Fail to parse a given time string.
+        return t;
+    }
+
     class NodeParser {
       public:
         explicit NodeParser(pugi::xml_node root) { traverse(root, ""); }
 
         const HashTable &getData() const { return Data; }
-const std::string &getTimeStamp() const {
-            return TimeStamp;
-        }
+        const std::string &getTimeStamp() const { return TimeStamp; }
 
       private:
         void traverse(pugi::xml_node root, const std::string &prefix) {
@@ -66,7 +72,7 @@ const std::string &getTimeStamp() const {
                     assert(Data.find(aKey) == Data.end());
                     Data[aKey] = aChild.value();
                 } else if (aChild.type() == pugi::node_comment) {
-TimeStamp = zillow::getTimeStamp(aChild.value());
+                    TimeStamp = zillow::getTimeStamp(aChild.value());
                 } else {
                     traverse(aChild, aKey);
                 }
