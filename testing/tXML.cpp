@@ -9,6 +9,19 @@
 #include "zillow/Serialization.hpp"
 #include "zillow/XMLParser.hpp"
 
+#include <iomanip>
+#include <iostream>
+#include <locale>
+#include <locale>
+#include <sstream>
+
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <string>
+
 void parseDeepSearchResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
@@ -55,12 +68,16 @@ void parseDeepSearchResults() {
             fmt::print("{0} - {1}\n", item.first, item.second);
         }
 
-        for (auto const & item : parser.getComments()) {
-          fmt::print("Comment: {}\n", item);
-        }
+        fmt::print("TimeStamp: {}\n", parser.getTimeStamp());
+        //        std::tm t;
+        // std::get_time(&t, "%a %b %d %H:%M:%S %Y");
 
-        std::string timeStr = zillow::getTimeStamp(parser.getComments());
-        fmt::print("Time stamp: {}\n", timeStr);
+        {
+            struct std::tm tm;
+            std::istringstream ss("16:35:12");
+            ss >> std::get_time(&tm, "%H:%M:%S"); // or just %T in this case
+            std::time_t time = mktime(tm);
+        }
     }
 }
 

@@ -9,24 +9,43 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 #include "Zillow.hpp"
 
 namespace zillow {
-  std::string getTimeStamp(const std::vector<std::string> &comments) {
-        for (auto const &item : comments) {
-            auto start = item.find(":R");
-            if (start == std::string::npos)
-              {continue;}
+    std::string getTimeStamp(const std::string &aComment) {
+        const size_t N = aComment.size();
+        size_t stop = N - 1;
 
-            auto stop = item.find("B:");
-            if (stop == std::string::npos)
-              {                continue;}
+        size_t begin = 0;
+        size_t len = 0;
+        size_t idx = 0;
 
-            fmt::print("start = {0} and stop = {1}\n", start, stop);
-            return std::string(item.substr(start+2, stop - 1))
-              ;
+        // Detect R: pattern
+        for (; idx < stop; ++idx) {
+            if (aComment[idx] == 'R') {
+                ++idx;
+                if (aComment[idx] == ':') {
+                    begin = ++idx;
+                    break;
+                }
+            }
         }
-        return "";
+
+        // Detect B: pattern
+        for (; idx < N; ++idx) {
+            if (aComment[idx] == 'B') {
+                ++idx;
+                if (aComment[idx] == ':') {
+                    len = idx - 1 - begin;
+                    break;
+                }
+            }
+        }
+
+        return aComment.substr(begin, len);
     }
 
     class NodeParser {
@@ -34,7 +53,9 @@ namespace zillow {
         explicit NodeParser(pugi::xml_node root) { traverse(root, ""); }
 
         const HashTable &getData() const { return Data; }
-        const std::vector<std::string> &getComments() const { return Comments; }
+const std::string &getTimeStamp() const {
+            return TimeStamp;
+        }
 
       private:
         void traverse(pugi::xml_node root, const std::string &prefix) {
@@ -42,12 +63,10 @@ namespace zillow {
                  aChild = aChild.next_sibling()) {
                 std::string aKey = prefix + "/" + aChild.name();
                 if (aChild.type() == pugi::node_pcdata) {
-                    assert(Data.find(aKey) == Data.end()); // This function
-                                                           // cannot handle
-                                                           // duplicated key.
+                    assert(Data.find(aKey) == Data.end());
                     Data[aKey] = aChild.value();
                 } else if (aChild.type() == pugi::node_comment) {
-                    Comments.emplace_back(aChild.value());
+TimeStamp = zillow::getTimeStamp(aChild.value());
                 } else {
                     traverse(aChild, aKey);
                 }
@@ -64,7 +83,7 @@ namespace zillow {
         }
 
         HashTable Data;
-        std::vector<std::string> Comments;
+        std::string TimeStamp;
     };
 
     /**
