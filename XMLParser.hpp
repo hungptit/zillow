@@ -48,13 +48,14 @@ namespace zillow {
         return aComment.substr(begin, len);
     }
 
-    std::tm to_tm(const std::string &timeStr) {
-        std::istringstream ss(timeStr);
-        std::tm t = {};
-        ss >> std::get_time(&t, "%a %b %d %H:%M:%S PDT %Y");
-        assert(!ss.fail()); // Fail to parse a given time string.
-        return t;
-    }
+// Only work for gcc-5.xx
+    // std::tm to_tm(const std::string &timeStr) {
+    //     std::istringstream ss(timeStr);
+    //     std::tm t = {};
+    //     ss >> std::get_time(&t, "%a %b %d %H:%M:%S PDT %Y");
+    //     assert(!ss.fail()); // Fail to parse a given time string.
+    //     return t;
+    // }
 
     class NodeParser {
       public:

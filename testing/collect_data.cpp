@@ -24,16 +24,15 @@ int main(int argc, char **argv) {
         ("max-house,m", po::value<size_t>(), "Street")
         ("desired-cities,t", po::value<std::vector<std::string>>(), "Desired cities.")
         ("desired-states,b", po::value<std::vector<std::string>>(), "Desired states.")
-        ("zwpid,w", po::value<std::string>(), "Zillow web ID");;
+        ("zwpid,w", po::value<std::string>(), "Zillow web ID")
+        ("database,d", po::value<std::string>(), "Database prefix.");;
     // clang-format on
 
     po::positional_options_description p;
     p.add("street", -1);
 
     po::variables_map vm;
-    po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(p).run(),
-        vm);
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     po::notify(vm);
 
     // Parse input arguments
@@ -47,7 +46,7 @@ int main(int argc, char **argv) {
         max_houses = vm["max-house"].as<size_t>();
     }
 
-    // bool verbose = vm.count("verbose");
+    bool verbose = vm.count("verbose");
 
     std::string street;
     if (vm.count("street")) {
@@ -73,26 +72,54 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string zwpid = zillow::ZWSID::ID2;
-    if (vm.count("zwpid")) {
-        zwpid = vm["zwpid"].as<std::string>();
-    }
+    std::string zwpid = (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID2;
+    // if (vm.count("zwpid")) {
+    //     zwpid = vm["zwpid"].as<std::string>();
+    // }
 
     std::vector<std::string> desiredCities;
-    if (vm.count("--desired-cities")) {
-      desiredCities= vm["desired-cities"].as<std::vector<std::string>>();
+    if (vm.count("desired-cities")) {
+        desiredCities = vm["desired-cities"].as<std::vector<std::string>>();
+    } else {
+        desiredCities.emplace_back(city);
     }
-        
+
     std::vector<std::string> desiredStates;
-    if (vm.count("--desired-state")) {
-      desiredStates= vm["desired-state"].as<std::vector<std::string>>();
+    if (vm.count("desired-states")) {
+        desiredStates = vm["desired-state"].as<std::vector<std::string>>();
+    } else {
+        desiredStates.emplace_back(state);
+    }
+
+    std::string database =
+        (vm.count("database")) ? vm["database"].as<std::string>() : "database";
+
+    if (verbose) {
+        fmt::print("Query info:\n\tStreet: {0}\n\tCity: {1}\n\tState: {2}\n\tmax_houses: "
+                   "{3}\n\tDatabase: {4}\n",
+                   street, city, state, max_houses, database);
+        
+        fmt::print("\tzwpid: {}\n", zwpid);
+
+        fmt::print("\tDesired cities: ");
+        for (auto const & item : desiredCities) {
+            fmt::print("{} ", item);
+        }
+        fmt::print("\n");
+
+        fmt::print("\tDesired states: ");
+            for (auto const & item : desiredStates) {
+                fmt::print("{}", item);
+            }
+        fmt::print("\n");
     }
 
     {
-        zillow::Crawler crawler(zwpid, max_houses);
-        crawler.exec(zillow::Address(street, 0, city, state, 0.0, 0.0), 25);
+        zillow::BasicConstraints constraints(desiredCities, desiredStates);
+        zillow::Crawler crawler(zwpid, max_houses, database);
+        crawler.exec(zillow::Address(street, 0, city, state, 0.0, 0.0), 25, constraints);
         crawler.save();
     }
-    
+
     return 0;
 }

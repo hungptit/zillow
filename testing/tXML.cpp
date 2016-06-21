@@ -123,7 +123,7 @@ void parseDeepCompsResults() {
     }
 
     // Write information to the database
-    zillow::writeToSQLite("database.db", deepComps, edges);
+    zillow::writeToSQLite("test_database.db", deepComps, edges);
 }
 
 int main() {
@@ -139,7 +139,7 @@ int main() {
     //           << "\n";
 
     parseDeepSearchResults();
-    // parseDeepCompsResults();
+    parseDeepCompsResults();
 
     return 0;
 }
