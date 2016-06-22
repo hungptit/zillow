@@ -12,6 +12,10 @@
 #include "zillow/Zillow.hpp"
 #include "zillow/ZillowWebCrawler.hpp"
 
+TEST(UpdatedPropertyDetails, Positive) {
+  
+}
+
 TEST(Constraints, Positive) {
     std::vector<std::string> cities{"Needham", "Newton", "Enfield"};
     std::vector<std::string> states{"MA", "CT"};

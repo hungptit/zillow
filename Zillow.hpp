@@ -34,10 +34,10 @@ namespace zillow {
         static const std::string ID1;
         static const std::string ID2;
     };
-    
+
     const std::string ZWSID::ID1 = "X1-ZWz1fbpbq5pogb_3wguv";
     const std::string ZWSID::ID2 = "X1-ZWz1f8wdb88lxn_1y8f9";
-    
+
     using IDType = unsigned int;
     using HashTable = std::unordered_map<std::string, std::string>;
     using Real = double;
@@ -51,18 +51,16 @@ namespace zillow {
         Real Score;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("src_id", SrcID),
-               cereal::make_nvp("dst_id", DstID),
+            ar(cereal::make_nvp("src_id", SrcID), cereal::make_nvp("dst_id", DstID),
                cereal::make_nvp("score", Score));
         }
     };
 
     struct Address {
-        explicit Address(const std::string &street, const int zipcode,
-                         const std::string &city, const std::string &state,
-                         const Real latitude, const Real longitude)
-            : Street(street), ZipCode(zipcode), City(city), State(state),
-              Latitude(latitude), Longitude(longitude) {}
+        explicit Address(const std::string &street, const int zipcode, const std::string &city,
+                         const std::string &state, const Real latitude, const Real longitude)
+            : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
+              Longitude(longitude) {}
         std::string Street;
         int ZipCode;
         std::string City;
@@ -71,8 +69,7 @@ namespace zillow {
         Real Longitude;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("street", Street),
-               cereal::make_nvp("zipcode", ZipCode),
+            ar(cereal::make_nvp("street", Street), cereal::make_nvp("zipcode", ZipCode),
                cereal::make_nvp("city", City), cereal::make_nvp("state", State),
                cereal::make_nvp("latitude", Latitude),
                cereal::make_nvp("longitude", Longitude));
@@ -80,12 +77,10 @@ namespace zillow {
     };
 
     struct Links {
-        explicit Links(const std::string &homedetails,
-                       const std::string &graphanddata,
-                       const std::string &mapthishome,
-                       const std::string &comparables)
-            : HomeDetails(homedetails), GraphAndData(graphanddata),
-              MapThisHome(mapthishome), Comparables(comparables) {}
+        explicit Links(const std::string &homedetails, const std::string &graphanddata,
+                       const std::string &mapthishome, const std::string &comparables)
+            : HomeDetails(homedetails), GraphAndData(graphanddata), MapThisHome(mapthishome),
+              Comparables(comparables) {}
 
         std::string HomeDetails;
         std::string GraphAndData;
@@ -102,11 +97,9 @@ namespace zillow {
 
     struct ZEstimate {
         explicit ZEstimate()
-            : Amount(), Low(), High(), Currency("USB"),
-              LastUpdated("01/01/1990"){};
+            : Amount(), Low(), High(), Currency("USB"), LastUpdated("01/01/1990"){};
 
-        explicit ZEstimate(Real amount, Real low, Real high,
-                           const std::string &currency,
+        explicit ZEstimate(Real amount, Real low, Real high, const std::string &currency,
                            const std::string &last_updated)
             : Amount(amount), Low(low), High(high), Currency(currency),
               LastUpdated(last_updated) {}
@@ -117,22 +110,19 @@ namespace zillow {
         std::string LastUpdated;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("currency", Currency),
-               cereal::make_nvp("amount", Amount), cereal::make_nvp("low", Low),
-               cereal::make_nvp("high", High),
+            ar(cereal::make_nvp("currency", Currency), cereal::make_nvp("amount", Amount),
+               cereal::make_nvp("low", Low), cereal::make_nvp("high", High),
                cereal::make_nvp("last_updated", LastUpdated));
         }
     };
 
     struct HouseInfo {
         explicit HouseInfo(const Address &address, const std::string &useCode,
-                           const int yearBuilt, Real lotSizeSqFt,
-                           Real finishedSqFt, Real bathrooms, int bedrooms,
-                           int totalRooms)
+                           const int yearBuilt, Real lotSizeSqFt, Real finishedSqFt,
+                           Real bathrooms, int bedrooms, int totalRooms)
             : HouseAddress(address), UseCode(useCode), YearBuilt(yearBuilt),
-              LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt),
-              Bathrooms(bathrooms), Bedrooms(bedrooms), TotalRooms(totalRooms) {
-        }
+              LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt), Bathrooms(bathrooms),
+              Bedrooms(bedrooms), TotalRooms(totalRooms) {}
         Address HouseAddress;
         std::string UseCode;
         int YearBuilt;
@@ -143,13 +133,11 @@ namespace zillow {
         int TotalRooms;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("address", HouseAddress),
-               cereal::make_nvp("useCode", UseCode),
+            ar(cereal::make_nvp("address", HouseAddress), cereal::make_nvp("useCode", UseCode),
                cereal::make_nvp("yearBuilt", YearBuilt),
                cereal::make_nvp("lotSizeSqFt", LotSizeSqFt),
                cereal::make_nvp("finishedSqFt", FinishedSqFt),
-               cereal::make_nvp("bathrooms", Bathrooms),
-               cereal::make_nvp("bedrooms", Bedrooms),
+               cereal::make_nvp("bathrooms", Bathrooms), cereal::make_nvp("bedrooms", Bedrooms),
                cereal::make_nvp("totalRooms", TotalRooms));
         }
     };
@@ -172,8 +160,7 @@ namespace zillow {
             : LastSoldDate("01/01/1990"), LastSoldPrice(0.0), Currency("USD") {}
         explicit SaleRecord(const std::string &soldDate, const Real soldPrice,
                             const std::string &currency)
-            : LastSoldDate(soldDate), LastSoldPrice(soldPrice),
-              Currency(currency) {}
+            : LastSoldDate(soldDate), LastSoldPrice(soldPrice), Currency(currency) {}
 
         std::string LastSoldDate;
         Real LastSoldPrice;
@@ -187,8 +174,7 @@ namespace zillow {
     };
 
     struct QueryRequest {
-        explicit QueryRequest(const std::string &street,
-                              const std::string &citystatezip)
+        explicit QueryRequest(const std::string &street, const std::string &citystatezip)
             : Street(street), CityStateZip(citystatezip) {}
         std::string Street;
         std::string CityStateZip;
@@ -200,24 +186,21 @@ namespace zillow {
     };
 
     struct Message {
-        explicit Message(const std::string &text, const int code)
-            : Text(text), Code(code) {}
+        explicit Message(const std::string &text, const int code) : Text(text), Code(code) {}
         std::string Text;
         int Code;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("Text", Text),
-               cereal::make_nvp("Code", Code));
+            ar(cereal::make_nvp("Text", Text), cereal::make_nvp("Code", Code));
         }
     };
 
     struct DeepSearchResults {
         explicit DeepSearchResults(unsigned long zid, const HouseInfo &hinfo,
                                    const Links &zlinks, const TaxInfo &tinfo,
-                                   const SaleRecord &srecord,
-                                   const ZEstimate &zes)
-            : zpid(zid), info(hinfo), links(zlinks), tax(tinfo),
-              saleRecord(srecord), zestimate(zes) {}
+                                   const SaleRecord &srecord, const ZEstimate &zes)
+            : zpid(zid), info(hinfo), links(zlinks), tax(tinfo), saleRecord(srecord),
+              zestimate(zes) {}
         unsigned long zpid;
         HouseInfo info;
         Links links;
@@ -227,13 +210,51 @@ namespace zillow {
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("zpid", zpid), cereal::make_nvp("links", links),
-               cereal::make_nvp("house-info", info),
-               cereal::make_nvp("tax-info", tax),
+               cereal::make_nvp("house-info", info), cereal::make_nvp("tax-info", tax),
                cereal::make_nvp("sale-record", saleRecord),
                cereal::make_nvp("zestimate", zestimate));
         }
     };
 
+    struct ImageLinks {
+        std::string PhotoGalery;
+        std::vector<std::string> Images;
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("photo-galery", PhotoGalery),
+               cereal::make_nvp("images", Images));
+        }
+    };
+
+    using PageViewCount = std::array<int, 2>;
+
+    struct EdditedFacts {
+        std::string UseCode;
+        Real Bathrooms;
+        int Bedrooms;
+        int TotalRooms;
+      Real LotSizeSqFt;
+      Real FinishedSqFt;
+        Real YearBuilt;
+        std::string Appliances;
+        std::string HomeDescriptions;
+
+      template <typename Archive> void serialize(Archive &ar) {
+        ar(cereal::make_nvp("useCode", zpid),
+           cereal::make_nvp("bathrooms", Bathrooms),
+           cereal::make_nvp("bedrooms", Bedrooms),
+           cereal::make_nvp("totalRooms", TotalRooms),
+           cereal::make_nvp("house-info", info), cereal::make_nvp("tax-info", tax),
+           cereal::make_nvp("sale-record", saleRecord),
+           cereal::make_nvp("zestimate", zestimate));
+      }
+    };
+
+    struct UpdatedPropertyDetails {
+        IDType zpid;
+        PageViewCount pageViewCount;
+        Address address;
+    };
 
     void strrep(std::string &s, char oldChar, char newChar) {
         const size_t N = s.size();
@@ -276,12 +297,12 @@ namespace zillow {
 
         bool isValid(const Address &address) {
             fmt::print("Cities: ");
-            for (const std::string & item : DesiredCities) {
+            for (const std::string &item : DesiredCities) {
                 fmt::print("{} ", item);
             }
             fmt::print("\n");
             fmt::print("States: ");
-            for (const std::string & item : DesiredStates) {
+            for (const std::string &item : DesiredStates) {
                 fmt::print("{} ", item);
             }
             fmt::print("\n");
@@ -294,6 +315,5 @@ namespace zillow {
         std::unordered_set<std::string> DesiredCities;
         std::unordered_set<std::string> DesiredStates;
     };
-
 }
 #endif

@@ -22,6 +22,22 @@
 #include <sstream>
 #include <string>
 
+void parseUpdatedPropertyDetailsResults() {
+    pugi::xml_document doc;
+    pugi::xml_parse_result parseResults =
+        doc.load_file("updatedPropertyDetails.xml", pugi::parse_full);
+
+    // assert(parseResults == pugi::status_ok);
+
+    zillow::NodeParser parser(doc);
+    auto const &data = parser.getData();
+    for (auto item : data) {
+        fmt::print("{0} - {1}\n", item.first, item.second);
+    }
+
+    fmt::print("TimeStamp: {}\n", parser.getTimeStamp());
+}
+
 void parseDeepSearchResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
@@ -31,22 +47,22 @@ void parseDeepSearchResults() {
 
     auto request = zillow::parseDeepSearchResultsRequest(
         doc.child("SearchResults:searchresults").child("request"));
-    fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
-               std::get<0>(request), std::get<1>(request));
+    fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n", std::get<0>(request),
+               std::get<1>(request));
 
-    auto message = zillow::parseMessage(
-        doc.child("SearchResults:searchresults").child("message"));
+    auto message =
+        zillow::parseMessage(doc.child("SearchResults:searchresults").child("message"));
     {
         std::ostringstream os;
         zillow::print<cereal::JSONOutputArchive>(os, message);
         fmt::print("{}\n", os.str());
     }
 
-    auto response = zillow::parseDeepSearchResultsResponse(
-        doc.child("SearchResults:searchresults")
-            .child("response")
-            .child("results")
-            .child("result"));
+    auto response =
+        zillow::parseDeepSearchResultsResponse(doc.child("SearchResults:searchresults")
+                                                   .child("response")
+                                                   .child("results")
+                                                   .child("result"));
 
     std::ostringstream os;
     zillow::print<cereal::JSONOutputArchive>(os, response);
@@ -80,13 +96,11 @@ void parseDeepCompsResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults = doc.load_file("deepCompsResults.xml");
     // assert(parseResults == pugi::status_ok);
-    auto request = zillow::parseDeepCompsRequest(
-        doc.child("Comps:comps").child("request"));
+    auto request = zillow::parseDeepCompsRequest(doc.child("Comps:comps").child("request"));
     fmt::print("request: \n\tzpid: {0}\n\tcount : {1}\n", std::get<0>(request),
                std::get<1>(request));
 
-    auto message =
-        zillow::parseMessage(doc.child("Comps:comps").child("message"));
+    auto message = zillow::parseMessage(doc.child("Comps:comps").child("message"));
     {
         std::ostringstream os;
         zillow::print<cereal::JSONOutputArchive>(os, message);
@@ -138,8 +152,9 @@ int main() {
     // std::cout << "Query zipcode: " << query_zipcode.evaluate_string(doc)
     //           << "\n";
 
-    parseDeepSearchResults();
-    parseDeepCompsResults();
+    // parseDeepSearchResults();
+    // parseDeepCompsResults();
+    parseUpdatedPropertyDetailsResults();
 
     return 0;
 }
