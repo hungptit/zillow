@@ -14,6 +14,18 @@ namespace std {
             return h1 ^ (h2 << 1);
         }
     };
+
+    template <> struct hash<zillow::Address> {
+        typedef zillow::Address argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(const argument_type &aKey) const {
+            result_type const h1(std::hash<std::string>()(aKey.Street));
+            result_type const h2(std::hash<size_t>()(aKey.ZipCode));
+            result_type const h3(std::hash<std::string>()(aKey.City));
+            result_type const h4(std::hash<std::string>()(aKey.State));
+            return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+        }
+    };
 }
 
 #endif

@@ -15,6 +15,7 @@
 #include "Serialization.hpp"
 #include "XMLParser.hpp"
 #include "Zillow.hpp"
+#include "Utils.hpp"
 
 #include "utils/LevelDBIO.hpp"
 

@@ -1,7 +1,7 @@
 #ifndef Operators_hpp
 #define Operators_hpp
 
-#include "Zillow.hpp"
+#include "DataStructures.hpp"
 
 namespace zillow {
     bool operator==(const EdgeData &lhs, const EdgeData &rhs) {

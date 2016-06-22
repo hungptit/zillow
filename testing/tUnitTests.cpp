@@ -13,6 +13,7 @@
 #include "zillow/Operators.hpp"
 #include "zillow/Zillow.hpp"
 #include "zillow/ZillowWebCrawler.hpp"
+#include "zillow/Constraints.hpp"
 
 #include <unordered_set>
 
