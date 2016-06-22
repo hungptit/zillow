@@ -9,20 +9,22 @@
 #include "utils/TemporaryDirectory.hpp"
 #include "utils/Timer.hpp"
 
+#include "zillow/Constraints.hpp"
 #include "zillow/Hash.hpp"
 #include "zillow/Operators.hpp"
 #include "zillow/Zillow.hpp"
 #include "zillow/ZillowWebCrawler.hpp"
-#include "zillow/Constraints.hpp"
 
 #include <unordered_set>
 
 TEST(EdgeData, Positive) {
     std::vector<zillow::EdgeData> data = {
         zillow::EdgeData{1, 2, 3.0}, zillow::EdgeData{2, 3, 3.0}, zillow::EdgeData{2, 3, 4.0}};
-
-std::sort(data.begin(), data.end(), zillow::Greater<zillow::EdgeData>());
+    std::sort(data.begin(), data.end(), zillow::Greater<zillow::EdgeData>());
     std::unordered_set<zillow::EdgeData> aSet(data.begin(), data.end());
+
+    EXPECT_TRUE(data.size() == 3);
+    EXPECT_TRUE(aSet.size() == 2);
 
     // Display the output
     std::ostringstream output;

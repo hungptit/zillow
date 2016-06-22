@@ -42,6 +42,19 @@ namespace zillow {
         IDType DstID;
         Real Score;
 
+        EdgeData(const EdgeData &data)
+            : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
+
+        EdgeData(EdgeData &&data)
+            : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
+
+        EdgeData & operator=(EdgeData rhs) {
+            std::swap(SrcID, rhs.SrcID);
+            std::swap(DstID, rhs.DstID);
+            std::swap(Score, rhs.Score);
+            return *this;
+        }
+
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("srcid", SrcID), cereal::make_nvp("dstid", DstID),
                cereal::make_nvp("score", Score));
@@ -53,12 +66,24 @@ namespace zillow {
                          const std::string &state, const Real latitude, const Real longitude)
             : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
               Longitude(longitude) {}
+
         std::string Street;
         size_t ZipCode;
         std::string City;
         std::string State;
         Real Latitude;
         Real Longitude;
+
+        Address(const Address &data)
+            : Street(data.Street), ZipCode(data.ZipCode), City(data.City), State(data.State),
+              Latitude(data.Latitude), Longitude(data.Longitude) {}
+
+        Address(Address &&data) noexcept : Street(std::move(data.Street)),
+                                           ZipCode(data.ZipCode),
+                                           City(std::move(data.City)),
+                                           State(std::move(data.State)),
+                                           Latitude(data.Latitude),
+                                           Longitude(data.Longitude) {}
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("street", Street), cereal::make_nvp("zipcode", ZipCode),
@@ -73,6 +98,15 @@ namespace zillow {
                        const std::string &mapthishome, const std::string &comparables)
             : HomeDetails(homedetails), GraphAndData(graphanddata), MapThisHome(mapthishome),
               Comparables(comparables) {}
+
+        Links(const Links &data)
+            : HomeDetails(data.HomeDetails), GraphAndData(data.GraphAndData),
+              MapThisHome(data.MapThisHome), Comparables(data.Comparables) {}
+
+        Links(Links &&data) noexcept : HomeDetails(std::move(data.HomeDetails)),
+                                       GraphAndData(std::move(data.GraphAndData)),
+                                       MapThisHome(std::move(data.MapThisHome)),
+                                       Comparables(std::move(data.Comparables)) {}
 
         std::string HomeDetails;
         std::string GraphAndData;
