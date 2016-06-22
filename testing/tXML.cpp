@@ -9,10 +9,23 @@
 #include "zillow/Serialization.hpp"
 #include "zillow/XMLParser.hpp"
 
+#include <iomanip>
+#include <iostream>
+#include <locale>
+#include <locale>
+#include <sstream>
+
+#include <ctime>
+#include <iomanip>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <string>
+
 void parseDeepSearchResults() {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
-        doc.load_file("deepSearchResults.xml");
+        doc.load_file("deepSearchResults.xml", pugi::parse_full);
 
     // assert(parseResults == pugi::status_ok);
 
@@ -46,6 +59,20 @@ void parseDeepSearchResults() {
         zillow::print<cereal::JSONOutputArchive>(os, response);
         zillow::print<cereal::XMLOutputArchive>(os, response);
         fmt::print("{}\n", os.str());
+    }
+
+    {
+        zillow::NodeParser parser(doc);
+        auto const &data = parser.getData();
+        for (auto item : data) {
+            fmt::print("{0} - {1}\n", item.first, item.second);
+        }
+
+        fmt::print("TimeStamp: {}\n", parser.getTimeStamp());
+        // auto t = zillow::to_tm(parser.getTimeStamp());
+        // auto results = std::put_time(&t, "%c");
+        // fmt::print("Parsed time {}", std::string(results));
+        // // std::cout << "Parsed time: " << std::put_time(&t, "%c") << "\n";
     }
 }
 
@@ -96,7 +123,7 @@ void parseDeepCompsResults() {
     }
 
     // Write information to the database
-    zillow::writeToSQLite("database.db", deepComps, edges);
+    zillow::writeToSQLite("test_database.db", deepComps, edges);
 }
 
 int main() {

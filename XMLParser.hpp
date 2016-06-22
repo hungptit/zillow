@@ -9,14 +9,60 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 #include "Zillow.hpp"
 
 namespace zillow {
+    std::string getTimeStamp(const std::string &aComment) {
+        const size_t N = aComment.size();
+        size_t stop = N - 1;
+
+        size_t begin = 0;
+        size_t len = 0;
+        size_t idx = 0;
+
+        // Detect R: pattern
+        for (; idx < stop; ++idx) {
+            if (aComment[idx] == 'R') {
+                ++idx;
+                if (aComment[idx] == ':') {
+                    begin = ++idx;
+                    break;
+                }
+            }
+        }
+
+        // Detect B: pattern
+        for (; idx < N; ++idx) {
+            if (aComment[idx] == 'B') {
+                ++idx;
+                if (aComment[idx] == ':') {
+                    len = idx - 1 - begin;
+                    break;
+                }
+            }
+        }
+
+        return aComment.substr(begin, len);
+    }
+
+// Only work for gcc-5.xx
+    // std::tm to_tm(const std::string &timeStr) {
+    //     std::istringstream ss(timeStr);
+    //     std::tm t = {};
+    //     ss >> std::get_time(&t, "%a %b %d %H:%M:%S PDT %Y");
+    //     assert(!ss.fail()); // Fail to parse a given time string.
+    //     return t;
+    // }
+
     class NodeParser {
       public:
         explicit NodeParser(pugi::xml_node root) { traverse(root, ""); }
 
-        const HashTable getData() const { return Data; }
+        const HashTable &getData() const { return Data; }
+        const std::string &getTimeStamp() const { return TimeStamp; }
 
       private:
         void traverse(pugi::xml_node root, const std::string &prefix) {
@@ -24,10 +70,10 @@ namespace zillow {
                  aChild = aChild.next_sibling()) {
                 std::string aKey = prefix + "/" + aChild.name();
                 if (aChild.type() == pugi::node_pcdata) {
-                    assert(Data.find(aKey) == Data.end()); // This function
-                                                           // cannot handle
-                                                           // duplicated key.
+                    assert(Data.find(aKey) == Data.end());
                     Data[aKey] = aChild.value();
+                } else if (aChild.type() == pugi::node_comment) {
+                    TimeStamp = zillow::getTimeStamp(aChild.value());
                 } else {
                     traverse(aChild, aKey);
                 }
@@ -39,9 +85,12 @@ namespace zillow {
                 std::string aKey = prefix + "/" + aChild.name();
                 Data[aKey] = aChild.value();
             }
+
+            // Get all comments for this node
         }
 
         HashTable Data;
+        std::string TimeStamp;
     };
 
     /**

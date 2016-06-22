@@ -26,10 +26,8 @@
 #include <vector>
 
 namespace {
-    bool doRequest(Poco::Net::HTTPClientSession &session,
-                   Poco::Net::HTTPRequest &request,
-                   Poco::Net::HTTPResponse &response,
-                   std::stringstream &output) {
+    bool doRequest(Poco::Net::HTTPClientSession &session, Poco::Net::HTTPRequest &request,
+                   Poco::Net::HTTPResponse &response, std::stringstream &output) {
         session.sendRequest(request);
         std::istream &rs = session.receiveResponse(response);
         if (response.getStatus() == Poco::Net::HTTPResponse::HTTP_OK) {
@@ -55,55 +53,27 @@ namespace zillow {
         return doRequest(session, request, response, output);
     }
 
-    void strrep(std::string &s, char oldChar, char newChar) {
-        const size_t N = s.size();
-        for (size_t idx = 0; idx < N; ++idx) {
-            if (s[idx] == oldChar) {
-                s[idx] = newChar;
-            }
-        }
-    }
-
-    std::string generateDeepSearchQuery(const std::string &zwpid,
-                                        const Address &info) {
-        std::string aStreet(info.Street);
-        strrep(aStreet, ' ', '+');
-        std::string aCity(info.City);
-        strrep(aCity, ' ', '+');
-
-        return "http://www.zillow.com/webservice/"
-               "GetDeepSearchResults.htm?zws-id=" +
-               zwpid + "&address=" + aStreet + "&citystatezip=" + aCity +
-               "%2C+" + info.State;
-    }
-
-    std::string generateDeepCompsQuery(const std::string &zwpid,
-                                       const long zpid, const int count) {
-        return "http://www.zillow.com/webservice/GetDeepComps.htm?zws-id=" +
-               zwpid + "&zpid=" + std::to_string(zpid) + "&count=" +
-               std::to_string(count);
-    }
-
-    std::string generateUpdatedPropertyDetailsQuery(const std::string &zwpid,
-                                       const long zpid) {
-        return "http://www.zillow.com/webservice/GetUpdatedPropertyDetails.htm?zws-id=" +
-               zwpid + "&zpid=" + std::to_string(zpid);
-    }
-
     // Craw all related data for a given house using DFS algorithms.
     class Crawler {
       public:
         explicit Crawler(const std::string &userid, const size_t num)
-            : Vertexes(), Edges(), Visited(), Processed(), Queue(), HouseIDs(),
-              zwpid(userid), SQLiteDatabase("database.db"),
-              NoSQLDatabase("info"), max_houses(num),
-              NoSQLDatabaseWriter(NoSQLDatabase) {}
+            : NumberOfQueries(0), Vertexes(), Edges(), Visited(), Processed(), Queue(),
+              HouseIDs(), zwpid(userid), Database("database"), max_houses(num),
+              NoSQLWriter(Database) {}
 
-        void exec(const Address &aHouse, const int count) {
+        explicit Crawler(const std::string &userid, const size_t num,
+                         const std::string &dataFile)
+            : NumberOfQueries(0), Vertexes(), Edges(), Visited(), Processed(), Queue(),
+              HouseIDs(), zwpid(userid), Database(dataFile), max_houses(num),
+              NoSQLWriter(Database) {}
+
+        template <typename Constraints>
+        void exec(const Address &aHouse, const int count, Constraints &cons) {
             // Crawl the data of a given house
             std::string queryCmd = generateDeepSearchQuery(zwpid, aHouse);
             std::stringstream output;
             bool status = zillow::query(queryCmd, output);
+            ++NumberOfQueries;
             if (!status) {
                 fmt::print("Cannot query this link: {}", queryCmd);
                 return;
@@ -112,24 +82,23 @@ namespace zillow {
             pugi::xml_document doc;
             pugi::xml_parse_result parseResults = doc.load(output);
             // assert(parseResults == pugi::status_ok);
-            auto message = zillow::parseMessage(
-                doc.child("SearchResults:searchresults").child("message"));
+            auto message =
+                zillow::parseMessage(doc.child("SearchResults:searchresults").child("message"));
 
             assert(message.Code == 0);
             if (message.Code) {
-                fmt::print("Error ===> Could not query this address: {}\n",
-                           queryCmd);
+                fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
                 std::ostringstream os;
                 print<cereal::JSONOutputArchive>(os, message);
                 fmt::print("{}\n", os.str());
                 return;
             }
 
-            auto response = zillow::parseDeepSearchResultsResponse(
-                doc.child("SearchResults:searchresults")
-                    .child("response")
-                    .child("results")
-                    .child("result"));
+            auto response =
+                zillow::parseDeepSearchResultsResponse(doc.child("SearchResults:searchresults")
+                                                           .child("response")
+                                                           .child("results")
+                                                           .child("result"));
             auto zpid = response.zpid;
 
             // For debuging purpose
@@ -145,12 +114,12 @@ namespace zillow {
 
             // Now crawl more data
             Queue.push_back(zpid);
-            traverse(count);
+            traverse(count, cons);
         }
 
         void disp(const int verbose_level) {
             switch (verbose_level) {
-              case 1:
+            case 1:
                 fmt::print("Number of vertexes: {}\n", Vertexes.size());
                 fmt::print("Number of edges: {}\n", Edges.size());
                 break;
@@ -159,23 +128,24 @@ namespace zillow {
 
         void save() const {
             // Serialize all data to JSON
-            std::stringstream output;
-            {
-                cereal::JSONOutputArchive oar(output);
-                oar(cereal::make_nvp("Vertexes", Vertexes),
-                    cereal::make_nvp("Edges", Edges));
-            }
-            writeTextFile(output, "crawled_data.json");
+            // std::stringstream output;
+            // {
+            //     cereal::JSONOutputArchive oar(output);
+            //     oar(cereal::make_nvp("Vertexes", Vertexes),
+            //         cereal::make_nvp("Edges", Edges));
+            // }
+            // writeTextFile(output, "crawled_data.json");
 
             // Write to SQLite database
             fmt::print("Number of vertexes: {0}\n", Vertexes.size());
             fmt::print("Number of edges: {0}\n", Edges.size());
-            writeToSQLite("database.db", Vertexes, Edges);
+            writeToSQLite(Database + ".db", Vertexes, Edges);
         }
 
         // Will need to use BFS traversal.
-        void traverse(int count) {
-            while (!Queue.empty() && (Vertexes.size() < max_houses)) {
+        template <typename Constraints> void traverse(int count, Constraints &cons) {
+            while (!Queue.empty() && (NumberOfQueries < 1000) &&
+                   (Vertexes.size() < max_houses)) {
                 const unsigned long zpid = Queue.front();
                 Queue.pop_front();
 
@@ -184,35 +154,34 @@ namespace zillow {
                 fmt::print("zpid = {}\n", zpid);
 
                 // Get DeepComps results
-                std::string queryCmd =
-                    zillow::generateDeepCompsQuery(zwpid, zpid, count);
+                std::string queryCmd = zillow::generateDeepCompsQuery(zwpid, zpid, count);
                 std::stringstream output;
 
                 auto results = zillow::query(queryCmd, output);
                 assert(results);
 
+                // Write crawled data to NoSQL database
                 const std::string aKey = "deepComps-" + std::to_string(zpid);
-                NoSQLDatabaseWriter.write(aKey, output.str());
-                
+                NoSQLWriter.write(aKey, output.str());
+
                 // Parse XML data
-                fmt::print("Parse XML data obtained from this query {}\n",
-                           queryCmd);
+                fmt::print("Parse XML data obtained from this query {}\n", queryCmd);
 
                 pugi::xml_document doc;
                 pugi::xml_parse_result parseResults = doc.load(output);
                 // assert(parseResults == pugi::status_ok);
 
-                Message message = zillow::parseMessage(
-                    doc.child("Comps:comps").child("message"));
-                
+                Message message =
+                    zillow::parseMessage(doc.child("Comps:comps").child("message"));
+
                 if (message.Code) {
-                    fmt::print("Error ===> Could not query this address: {}\n",
-                               queryCmd);
+                    fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
                     std::ostringstream os;
                     print<cereal::JSONOutputArchive>(os, message);
                     fmt::print("{}\n", os.str());
-                    
-                    // If we could not query data for a given address then skip it.
+
+                    // If we could not query data for a given address then skip
+                    // it.
                     continue;
                 }
 
@@ -220,10 +189,8 @@ namespace zillow {
 
                 std::vector<DeepSearchResults> houses;
                 std::vector<EdgeData> e;
-                std::tie(houses, e) =
-                    zillow::parseDeepCompsResponse(doc.child("Comps:comps")
-                                                       .child("response")
-                                                       .child("properties"));
+                std::tie(houses, e) = zillow::parseDeepCompsResponse(
+                    doc.child("Comps:comps").child("response").child("properties"));
 
                 // fmt::print("Get the results\n");
 
@@ -241,11 +208,12 @@ namespace zillow {
                     auto child_zpid = aHouse.zpid;
                     auto aCity = aHouse.info.HouseAddress.City;
                     if (Visited.find(child_zpid) == Visited.end()) {
-                        fmt::print("child_zpid = {0} -> {1}, {2} {3}\n",
-                                   child_zpid, aHouse.info.HouseAddress.Street,
-                                   aHouse.info.HouseAddress.City,
-                                   aHouse.info.HouseAddress.State);
-                        Queue.push_back(child_zpid);
+                        auto const anAddress = aHouse.info.HouseAddress;
+                        if (cons.isValid(anAddress)) {
+                            fmt::print("child_zpid = {0} -> {1}, {2} {3}\n", child_zpid,
+                                       anAddress.Street, anAddress.City, anAddress.State);
+                            Queue.push_back(child_zpid);
+                        }
 
                         // Only insert a current house if it does not exist in
                         // the database.
@@ -259,18 +227,17 @@ namespace zillow {
         }
 
       private:
+        size_t NumberOfQueries;
         std::vector<DeepSearchResults> Vertexes;
         std::vector<EdgeData> Edges;
         std::unordered_set<unsigned long> Visited;
         std::unordered_set<unsigned long> Processed;
         std::deque<unsigned long> Queue;
         std::unordered_set<IDType> HouseIDs;
-
         std::string zwpid;
-        std::string SQLiteDatabase;
-        std::string NoSQLDatabase;
+        std::string Database;
         size_t max_houses;
-        utils::Writer NoSQLDatabaseWriter;
+        utils::Writer NoSQLWriter;
     };
 }
 #endif

@@ -59,9 +59,8 @@ set(LIB_FMT "${PROJECTS_FOLDER}/3p/fmt/lib/libfmt.a")
 set(LIB_SNAPPY "${PROJECTS_FOLDER}/3p/snappy/lib/libsnappy.a")
 
 if (Boost_FOUND)
-  message(${Boost_LIBRARIES})
   include_directories(${BOOST_INCLUDE_DIRS})  
-  set(COMMAND_SRC_FILES deepSearchResults deepComps updatedPropertyDetails tXML collect_data tSQLite)
+  set(COMMAND_SRC_FILES deepSearchResults deepComps updatedPropertyDetails collect_data)
   foreach (src_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${src_file} ${src_file}.cpp)
     TARGET_LINK_LIBRARIES(${src_file}
@@ -79,4 +78,24 @@ if (Boost_FOUND)
       -lpthread -lrt)
   endforeach (src_file)
   INSTALL_PROGRAMS(//$ENV{HOME}/Public/sbtools FILES ${COMMAND_SRC_FILES})
+
+  set(COMMAND_SRC_FILES tUnitTests tXML tSQLite)
+  foreach (test_file ${COMMAND_SRC_FILES})
+    ADD_EXECUTABLE(${test_file} ${test_file}.cpp)
+    TARGET_LINK_LIBRARIES(${test_file}
+      ${Boost_LIBRARIES}
+      ${LIB_LEVELDB}
+      ${LIB_FMT}
+      ${LIB_SNAPPY}  
+      ${LIB_GTEST} ${LIB_GTEST_MAIN}
+      ${LIB_POCO_UTIL}
+      ${LIB_POCO_NET}
+      ${LIB_POCO_XML}
+      ${LIB_POCO_SQLITE}
+      ${LIB_POCO_FOUNDATION}
+      ${LIB_POCO_DATA}
+      ${LIB_POCO_SQLITE} -ldl -lpthread
+      -lpthread -lrt)
+    ADD_TEST(${test_file} ./${test_file})
+  endforeach (test_file)
 endif (Boost_FOUND)
