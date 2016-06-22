@@ -1,0 +1,19 @@
+#ifndef Hash_hpp
+#define Hash_hpp
+
+#include "Zillow.hpp"
+
+// Define the hash objects for some data structures.
+namespace std {
+    template <> struct hash<zillow::EdgeData> {
+        typedef zillow::EdgeData argument_type;
+        typedef std::size_t result_type;
+        result_type operator()(const argument_type &aKey) const {
+            result_type const h1(std::hash<zillow::IDType>()(aKey.SrcID));
+            result_type const h2(std::hash<zillow::IDType>()(aKey.DstID));
+            return h1 ^ (h2 << 1);
+        }
+    };
+}
+
+#endif

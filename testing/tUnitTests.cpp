@@ -9,12 +9,31 @@
 #include "utils/TemporaryDirectory.hpp"
 #include "utils/Timer.hpp"
 
+#include "zillow/Hash.hpp"
+#include "zillow/Operators.hpp"
 #include "zillow/Zillow.hpp"
 #include "zillow/ZillowWebCrawler.hpp"
 
-TEST(UpdatedPropertyDetails, Positive) {
-  
+#include <unordered_set>
+
+TEST(EdgeData, Positive) {
+    std::vector<zillow::EdgeData> data = {
+        zillow::EdgeData{1, 2, 3.0}, zillow::EdgeData{2, 3, 3.0}, zillow::EdgeData{2, 3, 4.0}};
+
+std::sort(data.begin(), data.end(), zillow::Greater<zillow::EdgeData>());
+    std::unordered_set<zillow::EdgeData> aSet(data.begin(), data.end());
+
+    // Display the output
+    std::ostringstream output;
+    {
+        using OArchive = cereal::JSONOutputArchive;
+        OArchive oar(output);
+        oar(cereal::make_nvp("Vector", data), cereal::make_nvp("unordered_set", aSet));
+    }
+    fmt::print("Results: \n{}\n", output.str());
 }
+
+TEST(UpdatedPropertyDetails, Positive) {}
 
 TEST(Constraints, Positive) {
     std::vector<std::string> cities{"Needham", "Newton", "Enfield"};

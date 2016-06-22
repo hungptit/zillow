@@ -51,7 +51,7 @@ namespace zillow {
         Real Score;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("src_id", SrcID), cereal::make_nvp("dst_id", DstID),
+            ar(cereal::make_nvp("srcid", SrcID), cereal::make_nvp("dstid", DstID),
                cereal::make_nvp("score", Score));
         }
     };
@@ -210,8 +210,8 @@ namespace zillow {
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("zpid", zpid), cereal::make_nvp("links", links),
-               cereal::make_nvp("house-info", info), cereal::make_nvp("tax-info", tax),
-               cereal::make_nvp("sale-record", saleRecord),
+               cereal::make_nvp("HouseInfo", info), cereal::make_nvp("Tax", tax),
+               cereal::make_nvp("SaleRecord", saleRecord),
                cereal::make_nvp("zestimate", zestimate));
         }
     };
@@ -221,39 +221,41 @@ namespace zillow {
         std::vector<std::string> Images;
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("photo-galery", PhotoGalery),
-               cereal::make_nvp("images", Images));
+            ar(cereal::make_nvp("PhotoGalery", PhotoGalery),
+               cereal::make_nvp("Images", Images));
         }
     };
 
     using PageViewCount = std::array<int, 2>;
 
-    struct EdditedFacts {
+    struct EditedFacts {
         std::string UseCode;
         Real Bathrooms;
         int Bedrooms;
         int TotalRooms;
-      Real LotSizeSqFt;
-      Real FinishedSqFt;
+        Real LotSizeSqFt;
+        Real FinishedSqFt;
         Real YearBuilt;
         std::string Appliances;
         std::string HomeDescriptions;
 
-      template <typename Archive> void serialize(Archive &ar) {
-        ar(cereal::make_nvp("useCode", zpid),
-           cereal::make_nvp("bathrooms", Bathrooms),
-           cereal::make_nvp("bedrooms", Bedrooms),
-           cereal::make_nvp("totalRooms", TotalRooms),
-           cereal::make_nvp("house-info", info), cereal::make_nvp("tax-info", tax),
-           cereal::make_nvp("sale-record", saleRecord),
-           cereal::make_nvp("zestimate", zestimate));
-      }
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("UseCode", UseCode), cereal::make_nvp("Bathrooms", Bathrooms),
+               cereal::make_nvp("Bedrooms", Bedrooms),
+               cereal::make_nvp("TotalRooms", TotalRooms),
+               cereal::make_nvp("LotSizeSqFt", LotSizeSqFt),
+               cereal::make_nvp("FinishedSqFt", FinishedSqFt),
+               cereal::make_nvp("YearBuilt", YearBuilt),
+               cereal::make_nvp("Appliances", Appliances),
+               cereal::make_nvp("HomeDescriptions", HomeDescriptions));
+        }
     };
 
     struct UpdatedPropertyDetails {
         IDType zpid;
         PageViewCount pageViewCount;
         Address address;
+        EditedFacts editedFacts;
     };
 
     void strrep(std::string &s, char oldChar, char newChar) {
