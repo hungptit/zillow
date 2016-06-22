@@ -295,6 +295,10 @@ namespace zillow {
         // Return
         return std::make_tuple(results, edges);
     }
+
+
+  auto parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
+  }
 }
 
 #endif
