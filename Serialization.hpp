@@ -63,7 +63,7 @@ namespace zillow {
             OArchive oar(output);
             oar(cereal::make_nvp("Message", data));
         }
-        fmt::print("{}", output.str());
+        fmt::print("{}\n", output.str());
     }
 
     template <typename OArchive> void print(const Address &info) {
@@ -72,7 +72,7 @@ namespace zillow {
             OArchive oar(output);
             oar(cereal::make_nvp("Address", info));
         }
-        fmt::print("{}", output.str());
+        fmt::print("{}\n", output.str());
     }
 }
 #endif

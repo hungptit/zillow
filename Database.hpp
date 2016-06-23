@@ -81,6 +81,11 @@ namespace zillow {
                    "MapThisHome VARCHAR(255), Comparables VARCHAR(255))",
             now;
 
+        // Store notes about a particular house.
+        session << "CREATE TABLE IF NOT EXISTS Notes (zpid BIGINT NOT "
+                   "NULL, Notes VARCHAR(2048))",
+            now;
+
         // Update House table.
         {
             fmt::print("Update House table\n");

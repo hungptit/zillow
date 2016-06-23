@@ -16,10 +16,6 @@
 ** A web crawler will need to operate on the string stream. We should not create unneccesary temporary data.
 * TODO Save all raw data to DeepSearchResults, DeepCompsResults, and UpdatedDetailsResults leveldb database.
 * TODO Serialize all processed data into leveldb + sqlite databases?
-* TODO SaleRecord: Need to add seller and buyer agents plus the crawled time and notes.
-* TODO House: Need to add the time stamp.
-* TODO Edges: Need to add the time stamp.
-* TODO ZEstimate: Need to add  the time stamp.
 * TODO We will saved all raw data to leveldb and save all processed data to both leveldb and sqlite. We might need to reprocess the raw data to update all databases.
 * TODO Have a parser for the UpdatedPropertyDetails data.
 * TODO Have the final design for a web crawler that can
@@ -30,3 +26,4 @@
 ** Must be thread safe and need to have high performance.
 ** Can comunicate with the client -> get seed and some special commands such as update date for a given town.
 ** Can crawl data for a given town (limit the solution space -> save query count).
+* TODO Creae a list of email that can be used to query data from zillow. For example zillow-needham, zillow-springfield, zillow-enfield. The web crawler will be executed automatically to crawl latest from for these databases.

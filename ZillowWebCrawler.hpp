@@ -141,8 +141,9 @@ namespace zillow {
 
         // Will need to use BFS traversal.
         template <typename Constraints> void traverse(int count, Constraints &cons) {
+            bool needToStop = false;
             while (!Queue.empty() && (NumberOfQueries < 900) &&
-                   (Vertexes.size() < max_houses)) {
+                   (Vertexes.size() < max_houses) && !needToStop) {
                 const unsigned long zpid = Queue.front();
                 Queue.pop_front();
 
@@ -157,6 +158,7 @@ namespace zillow {
                 auto results = zillow::query(queryCmd, output);
                 if (!results) {
                     fmt::print("Cannot execute this query command: {}\n", queryCmd);
+                    continue;
                 }
 
                 // Write crawled data to NoSQL database
@@ -182,6 +184,10 @@ namespace zillow {
                     print<cereal::JSONOutputArchive>(message);
                     // If we could not query data for a given address then skip
                     // it.
+                    if (message.Code == 7) {
+                        // We have reach the maximum number of calls.
+                        needToStop = true;
+                    }
                     continue;
                 }
 
