@@ -14,16 +14,16 @@ namespace zillow {
               DesiredStates(states.begin(), states.end()) {}
 
         bool isValid(const Address &address) {
-            fmt::print("Cities: ");
-            for (const std::string &item : DesiredCities) {
-                fmt::print("{} ", item);
-            }
-            fmt::print("\n");
-            fmt::print("States: ");
-            for (const std::string &item : DesiredStates) {
-                fmt::print("{} ", item);
-            }
-            fmt::print("\n");
+            // fmt::print("Cities: ");
+            // for (const std::string &item : DesiredCities) {
+            //     fmt::print("{} ", item);
+            // }
+            // fmt::print("\n");
+            // fmt::print("States: ");
+            // for (const std::string &item : DesiredStates) {
+            //     fmt::print("{} ", item);
+            // }
+            // fmt::print("\n");
 
             return (DesiredStates.find(address.State) != DesiredStates.end()) &&
                 (DesiredCities.find(address.City) != DesiredCities.end());

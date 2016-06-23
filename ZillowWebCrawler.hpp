@@ -141,7 +141,7 @@ namespace zillow {
 
         // Will need to use BFS traversal.
         template <typename Constraints> void traverse(int count, Constraints &cons) {
-            while (!Queue.empty() && (NumberOfQueries < 1000) &&
+            while (!Queue.empty() && (NumberOfQueries < 900) &&
                    (Vertexes.size() < max_houses)) {
                 const unsigned long zpid = Queue.front();
                 Queue.pop_front();

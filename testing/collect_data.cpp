@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
     {
         zillow::BasicConstraints constraints(desiredCities, desiredStates);
         zillow::Crawler crawler(zwpid, max_houses, database);
-        crawler.exec(zillow::Address(street, 0, city, state, 0.0, 0.0), 25, constraints);
+        crawler.exec(zillow::Address(street, "0", city, state, 0.0, 0.0), 25, constraints);
         crawler.save();
     }
 
