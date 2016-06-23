@@ -11,7 +11,8 @@ namespace std {
         result_type operator()(const argument_type &aKey) const {
             result_type const h1(std::hash<zillow::IDType>()(aKey.SrcID));
             result_type const h2(std::hash<zillow::IDType>()(aKey.DstID));
-            return h1 ^ (h2 << 1);
+            result_type const h3(std::hash<zillow::IDType>()(aKey.Score));
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
         }
     };
 
@@ -20,10 +21,9 @@ namespace std {
         typedef std::size_t result_type;
         result_type operator()(const argument_type &aKey) const {
             result_type const h1(std::hash<std::string>()(aKey.Street));
-            result_type const h2(std::hash<size_t>()(aKey.ZipCode));
-            result_type const h3(std::hash<std::string>()(aKey.City));
-            result_type const h4(std::hash<std::string>()(aKey.State));
-            return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+            result_type const h2(std::hash<std::string>()(aKey.City));
+            result_type const h3(std::hash<std::string>()(aKey.State));
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
         }
     };
 }

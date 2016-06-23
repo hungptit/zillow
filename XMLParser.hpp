@@ -156,7 +156,7 @@ namespace zillow {
      */
     Address parseAddress(const HashTable &data) {
         return Address(data.find("/address/street/")->second,
-                       std::stoi(data.find("/address/zipcode/")->second),
+                       data.find("/address/zipcode/")->second,
                        data.find("/address/city/")->second,
                        data.find("/address/state/")->second,
                        std::stod(data.find("/address/latitude/")->second),
@@ -346,8 +346,9 @@ namespace zillow {
     }
 
 
-  auto parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
-  }
+  // auto parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
+      
+  // }
 }
 
 #endif

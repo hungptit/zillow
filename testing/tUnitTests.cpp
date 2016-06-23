@@ -19,12 +19,13 @@
 
 TEST(EdgeData, Positive) {
     std::vector<zillow::EdgeData> data = {
-        zillow::EdgeData{1, 2, 3.0}, zillow::EdgeData{2, 3, 3.0}, zillow::EdgeData{2, 3, 4.0}};
+        zillow::EdgeData{1, 2, 3.0}, zillow::EdgeData{2, 3, 3.0}, zillow::EdgeData{2, 3, 3.0},
+        zillow::EdgeData{2, 3, 4.0}};
     std::sort(data.begin(), data.end(), zillow::Greater<zillow::EdgeData>());
     std::unordered_set<zillow::EdgeData> aSet(data.begin(), data.end());
 
-    EXPECT_TRUE(data.size() == 3);
-    EXPECT_TRUE(aSet.size() == 2);
+    EXPECT_TRUE(data.size() == 4);
+    EXPECT_TRUE(aSet.size() == 3);
 
     // Display the output
     std::ostringstream output;
@@ -43,23 +44,23 @@ TEST(Constraints, Positive) {
     std::vector<std::string> states{"MA", "CT"};
     zillow::BasicConstraints constraints(cities, states);
     {
-        zillow::Address anAddress("", 0, "Needham", "MA", 0.0, 0.0);
+        zillow::Address anAddress("", "02492", "Needham", "MA", 0.0, 0.0);
         EXPECT_TRUE(constraints.isValid(anAddress));
     }
 
     {
-        zillow::Address anAddress("", 0, "Enfield", "CT", 0.0, 0.0);
+        zillow::Address anAddress("", "0", "Enfield", "CT", 0.0, 0.0);
         EXPECT_TRUE(constraints.isValid(anAddress));
     }
 
     {
-        zillow::Address anAddress("", 0, "Enfield1", "CT", 0.0, 0.0);
+        zillow::Address anAddress("", "0", "Enfield1", "CT", 0.0, 0.0);
         EXPECT_FALSE(constraints.isValid(anAddress));
     }
 
     {
         // TODO: Will need to change interface to exclude this case.
-        zillow::Address anAddress("", 0, "Needham", "CT", 0.0, 0.0);
+        zillow::Address anAddress("", "0", "Needham", "CT", 0.0, 0.0);
         EXPECT_TRUE(constraints.isValid(anAddress));
     }
 }

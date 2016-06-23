@@ -62,13 +62,13 @@ namespace zillow {
     };
 
     struct Address {
-        explicit Address(const std::string &street, const int zipcode, const std::string &city,
+        explicit Address(const std::string &street, const std::string &zipcode, const std::string &city,
                          const std::string &state, const Real latitude, const Real longitude)
             : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
               Longitude(longitude) {}
 
         std::string Street;
-        size_t ZipCode;
+        std::string ZipCode;
         std::string City;
         std::string State;
         Real Latitude;

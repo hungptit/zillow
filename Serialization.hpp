@@ -26,35 +26,53 @@
 #include "XMLParser.hpp"
 
 namespace zillow {
-    template <typename OArchive, typename OutputStream>
-    void print(OutputStream &output, const DeepSearchResults &data) {
-        OArchive oar(output);
-        const std::string aKey = data.info.HouseAddress.Street + "," +
-                                 data.info.HouseAddress.City + " " +
-                                 data.info.HouseAddress.State + " " +
-                                 std::to_string(data.info.HouseAddress.ZipCode);
-        oar(cereal::make_nvp(aKey, data));
+    template <typename OArchive> void print(const DeepSearchResults &data) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            const std::string aKey = data.info.HouseAddress.Street + ", " +
+                                     data.info.HouseAddress.City + " " +
+                                     data.info.HouseAddress.State + " " +
+                                     data.info.HouseAddress.ZipCode;
+            oar(cereal::make_nvp(aKey, data));
+        }
+        fmt::print("{}\n", output.str());
     }
 
-    template <typename OArchive, typename OutputStream>
-    void print(OutputStream &output,
-               const std::vector<DeepSearchResults> &data) {
-        OArchive oar(output);
-        oar(cereal::make_nvp("DeepComps results", data));
+    template <typename OArchive> void print(const std::vector<DeepSearchResults> &data) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("DeepComps results", data));
+        }
+        fmt::print("{}\n", output.str());
     }
 
-    template <typename OArchive, typename OutputStream>
-    void print(OutputStream &output,
-               const std::vector<EdgeData> &data) {
-        OArchive oar(output);
-        oar(cereal::make_nvp("Edges", data));
+    template <typename OArchive> void print(const std::vector<EdgeData> &data) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Edges", data));
+        }
+        fmt::print("{}\n", output.str());
     }
 
-    template <typename OArchive, typename OutputStream>
-    void print(OutputStream &output,
-               const Message &data) {
-        OArchive oar(output);
-        oar(cereal::make_nvp("Message", data));
+    template <typename OArchive> void print(const Message &data) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Message", data));
+        }
+        fmt::print("{}", output.str());
+    }
+
+    template <typename OArchive> void print(const Address &info) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Address", info));
+        }
+        fmt::print("{}", output.str());
     }
 }
 #endif

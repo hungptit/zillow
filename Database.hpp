@@ -15,7 +15,6 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/Session.h"
 
-
 namespace zillow {
     void writeTextFile(const std::stringstream &output, const std::string &dataFile) {
         std::ofstream outputFile;
@@ -48,7 +47,7 @@ namespace zillow {
         // UseCode, YearBuilt, LotSizeSqFt, FinishedSqFt, Bathrooms,
         // Bedrooms, TotalRooms)
         session << "CREATE TABLE IF NOT EXISTS House (zpid BIGINT NOT NULL "
-                   "UNIQUE, Street VARCHAR(128), ZipCode INT, City VARCHAR(32) "
+                   "UNIQUE, Street VARCHAR(128), ZipCode VARCHAR(10), City VARCHAR(32) "
                    "NOT NULL, State VARCHAR(3) NOT NULL, Latitude REAL, "
                    "Longitude REAL, "
                    "UseCode VARCHAR(31), YearBuilt INT, LotSizeSqFt REAL, "
@@ -91,8 +90,8 @@ namespace zillow {
             // (zpid, Street, ZipCode, City, State, Latitude, Longitude,
             // UseCode, YearBuilt, LotSizeSqFt, FinishedSqFt, Bathrooms,
             // Bedrooms, TotalRooms)
-            using Row = Poco::Tuple<IDType, std::string, int, std::string, std::string, Real,
-                                    Real, std::string, int, Real, Real, Real, int, int>;
+            using Row = Poco::Tuple<IDType, std::string, std::string, std::string, std::string,
+                                    Real, Real, std::string, int, Real, Real, Real, int, int>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
             for (auto const &item : vertexes) {

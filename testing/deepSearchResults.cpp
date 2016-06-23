@@ -88,7 +88,10 @@ int main(int argc, char **argv) {
     } else {
         pugi::xml_document doc;
         pugi::xml_parse_result parseResults = doc.load(output);
-        // assert(parseResults == pugi::status_ok);
+        if (parseResults) {
+            fmt::print("status: {}\n", parseResults.status);
+            fmt::print("description: {}\n", parseResults.description());
+        }
 
         {
             auto request = zillow::parseDeepSearchResultsRequest(
@@ -98,11 +101,7 @@ int main(int argc, char **argv) {
 
             auto message = zillow::parseMessage(
                 doc.child("SearchResults:searchresults").child("message"));
-            {
-                std::ostringstream os;
-                zillow::print<cereal::JSONOutputArchive>(os, message);
-                fmt::print("{}\n", os.str());
-            }
+            zillow::print<cereal::JSONOutputArchive>(message);
 
             auto response = zillow::parseDeepSearchResultsResponse(
                 doc.child("SearchResults:searchresults")
@@ -110,9 +109,7 @@ int main(int argc, char **argv) {
                 .child("results")
                 .child("result"));
 
-            std::ostringstream os;
-            zillow::print<cereal::JSONOutputArchive>(os, response);
-            fmt::print("{}\n", os.str());
+            zillow::print<cereal::JSONOutputArchive>(response);
         }
     }
 

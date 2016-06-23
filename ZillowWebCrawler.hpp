@@ -82,6 +82,10 @@ namespace zillow {
 
             pugi::xml_document doc;
             pugi::xml_parse_result parseResults = doc.load(output);
+            if (parseResults) {
+                fmt::print("status: {}\n", parseResults.status);
+                fmt::print("description: {}\n", parseResults.description());
+            }
             // assert(parseResults == pugi::status_ok);
             auto message =
                 zillow::parseMessage(doc.child("SearchResults:searchresults").child("message"));
@@ -89,9 +93,7 @@ namespace zillow {
             assert(message.Code == 0);
             if (message.Code) {
                 fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
-                std::ostringstream os;
-                print<cereal::JSONOutputArchive>(os, message);
-                fmt::print("{}\n", os.str());
+                print<cereal::JSONOutputArchive>(message);
                 return;
             }
 
@@ -101,13 +103,7 @@ namespace zillow {
                                                            .child("results")
                                                            .child("result"));
             auto zpid = response.zpid;
-
-            // For debuging purpose
-            {
-                std::ostringstream os;
-                print<cereal::JSONOutputArchive>(os, response);
-                fmt::print("{}\n", os.str());
-            }
+            print<cereal::JSONOutputArchive>(response);
 
             Visited.insert(zpid);
             HouseIDs.insert(zpid);
@@ -159,7 +155,9 @@ namespace zillow {
                 std::stringstream output;
 
                 auto results = zillow::query(queryCmd, output);
-                assert(results);
+                if (!results) {
+                    fmt::print("Cannot execute this query command: {}\n", queryCmd);
+                }
 
                 // Write crawled data to NoSQL database
                 const std::string aKey = "deepComps-" + std::to_string(zpid);
@@ -170,17 +168,18 @@ namespace zillow {
 
                 pugi::xml_document doc;
                 pugi::xml_parse_result parseResults = doc.load(output);
-                // assert(parseResults == pugi::status_ok);
+             
+                if (parseResults) {
+                    fmt::print("status: {}\n", parseResults.status);
+                    fmt::print("description: {}\n", parseResults.description());
+                }
 
                 Message message =
                     zillow::parseMessage(doc.child("Comps:comps").child("message"));
 
                 if (message.Code) {
                     fmt::print("Error ===> Could not query this address: {}\n", queryCmd);
-                    std::ostringstream os;
-                    print<cereal::JSONOutputArchive>(os, message);
-                    fmt::print("{}\n", os.str());
-
+                    print<cereal::JSONOutputArchive>(message);
                     // If we could not query data for a given address then skip
                     // it.
                     continue;

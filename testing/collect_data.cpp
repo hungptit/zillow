@@ -72,7 +72,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::string zwpid = (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID2;
+    std::string zwpid =
+        (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID2;
     // if (vm.count("zwpid")) {
     //     zwpid = vm["zwpid"].as<std::string>();
     // }
@@ -98,19 +99,19 @@ int main(int argc, char **argv) {
         fmt::print("Query info:\n\tStreet: {0}\n\tCity: {1}\n\tState: {2}\n\tmax_houses: "
                    "{3}\n\tDatabase: {4}\n",
                    street, city, state, max_houses, database);
-        
+
         fmt::print("\tzwpid: {}\n", zwpid);
 
         fmt::print("\tDesired cities: ");
-        for (auto const & item : desiredCities) {
+        for (auto const &item : desiredCities) {
             fmt::print("{} ", item);
         }
         fmt::print("\n");
 
         fmt::print("\tDesired states: ");
-            for (auto const & item : desiredStates) {
-                fmt::print("{}", item);
-            }
+        for (auto const &item : desiredStates) {
+            fmt::print("{}", item);
+        }
         fmt::print("\n");
     }
 
