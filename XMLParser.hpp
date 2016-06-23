@@ -48,7 +48,7 @@ namespace zillow {
         return aComment.substr(begin, len);
     }
 
-// Only work for gcc-5.xx
+    // Only work for gcc-5.xx
     // std::tm to_tm(const std::string &timeStr) {
     //     std::istringstream ss(timeStr);
     //     std::tm t = {};
@@ -104,19 +104,17 @@ namespace zillow {
              aChild = aChild.next_sibling()) {
             const std::string nodeName = aChild.name();
             if (aChild.type() == pugi::node_pcdata) {
-                std::cout << "Type = " << aChild.type() << " "
-                          << prefix + "/ --> " + nodeName << ":"
-                          << aChild.value() << "\n";
+                std::cout << "Type = " << aChild.type() << " " << prefix + "/ --> " + nodeName
+                          << ":" << aChild.value() << "\n";
             } else {
-                std::cout << "Type = " << aChild.type() << " "
-                          << prefix + "/ --> " + nodeName << ":"
-                          << aChild.value() << "\n";
+                std::cout << "Type = " << aChild.type() << " " << prefix + "/ --> " + nodeName
+                          << ":" << aChild.value() << "\n";
             }
 
-            for (pugi::xml_attribute anAttribute = aNode.first_attribute();
-                 anAttribute; anAttribute = anAttribute.next_attribute()) {
-                std::cout << "Attribute -> " << anAttribute.name() << ":"
-                          << anAttribute.value() << "\n";
+            for (pugi::xml_attribute anAttribute = aNode.first_attribute(); anAttribute;
+                 anAttribute = anAttribute.next_attribute()) {
+                std::cout << "Attribute -> " << anAttribute.name() << ":" << anAttribute.value()
+                          << "\n";
             }
             dfs(aChild, prefix + "/" + nodeName);
         }
@@ -155,12 +153,11 @@ namespace zillow {
      * @return
      */
     Address parseAddress(const HashTable &data) {
-        return Address(data.find("/address/street/")->second,
-                       data.find("/address/zipcode/")->second,
-                       data.find("/address/city/")->second,
-                       data.find("/address/state/")->second,
-                       std::stod(data.find("/address/latitude/")->second),
-                       std::stod(data.find("/address/longitude/")->second));
+        return Address(
+            data.find("/address/street/")->second, data.find("/address/zipcode/")->second,
+            data.find("/address/city/")->second, data.find("/address/state/")->second,
+            std::stod(data.find("/address/latitude/")->second),
+            std::stod(data.find("/address/longitude/")->second));
     }
 
     /**
@@ -195,23 +192,20 @@ namespace zillow {
         HashTable::const_iterator it;
 
         it = data.find("/lastSoldDate/");
-        std::string lastSoldDate =
-            (it != data.end()) ? it->second : "01/01/1990";
+        std::string lastSoldDate = (it != data.end()) ? it->second : "01/01/1990";
 
         it = data.find("/lastSoldPrice/");
         double lastSoldPrice = (it != data.end()) ? std::stod(it->second) : 0.0;
 
         it = data.find("/lastSoldPriceCurrency/");
-        std::string lastSoldPriceCurrency =
-            (it != data.end()) ? it->second : "USD";
+        std::string lastSoldPriceCurrency = (it != data.end()) ? it->second : "USD";
         return SaleRecord(lastSoldDate, lastSoldPrice, lastSoldPriceCurrency);
     }
 
     TaxInfo parseTaxInfo(const HashTable &data) {
         HashTable::const_iterator it;
         it = data.find("/taxAssessmentYear/");
-        int taxAssessmentYear =
-            (it != data.end()) ? std::stoi(it->second) : 1990;
+        int taxAssessmentYear = (it != data.end()) ? std::stoi(it->second) : 1990;
 
         it = data.find("/taxAssessment/");
         double taxAssessment = (it != data.end()) ? std::stod(it->second) : 0.0;
@@ -243,8 +237,8 @@ namespace zillow {
         it = data.find("/totalRooms/");
         int totalRooms = (it != data.end()) ? std::stod(it->second) : 0;
 
-        return HouseInfo(parseAddress(data), useCode, yearBuilt, lotSizeSqFt,
-                         finishedSqFt, bathrooms, bedrooms, totalRooms);
+        return HouseInfo(parseAddress(data), useCode, yearBuilt, lotSizeSqFt, finishedSqFt,
+                         bathrooms, bedrooms, totalRooms);
     }
 
     auto parseDeepSearchResultsRequest(pugi::xml_node rootNode) {
@@ -280,8 +274,7 @@ namespace zillow {
         if (!isValid) {
             fmt::print("==============================\n");
             fmt::print("Number of elements: {}\n", data.size());
-            std::map<std::string, std::string> sortedData(data.begin(),
-                                                          data.end());
+            std::map<std::string, std::string> sortedData(data.begin(), data.end());
             for (auto const &item : sortedData) {
                 fmt::print("\"{0}\" - {1}\n", item.first, item.second);
             }
@@ -307,9 +300,9 @@ namespace zillow {
         assert(it != data.end()); // This field must exist
         auto zpid = std::stoul(it->second);
 
-        return DeepSearchResults(zpid, parseHouseGeneralInfo(data),
-                                 parseLinks(data), parseTaxInfo(data),
-                                 parseSaleRecord(data), parseZestimate(data));
+        return DeepSearchResults(zpid, parseHouseGeneralInfo(data), parseLinks(data),
+                                 parseTaxInfo(data), parseSaleRecord(data),
+                                 parseZestimate(data));
     }
 
     DeepSearchResults parseDeepSearchResultsResponse(pugi::xml_node rootNode) {
@@ -323,8 +316,7 @@ namespace zillow {
         std::vector<EdgeData> edges;
 
         // Get the principal
-        auto principal =
-            parseDeepSearchResultsResponse(rootNode.child("principal"));
+        auto principal = parseDeepSearchResultsResponse(rootNode.child("principal"));
         auto principal_zpid = principal.zpid;
 
         // Get the comparison
@@ -336,8 +328,7 @@ namespace zillow {
             auto info = parseDeepSearchResultsResponse(aChild);
             HashTable::const_iterator it = data.find("/score");
             assert(it != data.end()); // score property must exist.
-            edges.emplace_back(
-                EdgeData(principal_zpid, info.zpid, std::stod(it->second)));
+            edges.emplace_back(EdgeData(principal_zpid, info.zpid, std::stod(it->second)));
             results.emplace_back(std::move(info));
         }
 
@@ -345,10 +336,58 @@ namespace zillow {
         return std::make_tuple(results, edges);
     }
 
+    EditedFacts parseEditedFacts(const HashTable &data) {
+        HashTable::const_iterator it;
 
-  // auto parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
-      
-  // }
+        it = data.find("/editedFacts/useCode/");
+        std::string useCode = (it != data.end()) ? it->second : "";
+
+        it = data.find("/editedFacts/bathrooms/");
+        double bathrooms = (it != data.end()) ? std::stod(it->second) : 0;
+
+        it = data.find("/editedFacts/bedrooms/");
+        int bedrooms = (it != data.end()) ? std::stod(it->second) : 0;
+
+        it = data.find("/editedFacts/yeearBuilt/");
+        int yearBuilt = (it != data.end()) ? std::stod(it->second) : 1900;
+
+        it = data.find("/editedFacts/lotSizeSqFt/");
+        double lotSizeSqFt = (it != data.end()) ? std::stod(it->second) : 0.0;
+
+        it = data.find("/editedFacts/finishedSqFt/");
+        double finishedSqFt = (it != data.end()) ? std::stod(it->second) : 0.0;
+
+        it = data.find("/editedFacts/numRooms/");
+        int totalRooms = (it != data.end()) ? std::stod(it->second) : 0;
+
+        it = data.find("/editedFacts/appliances/");
+        std::string appliances = (it != data.end()) ? it->second : "";
+
+        it = data.find("/homeDescription/");
+        std::string descriptions = (it != data.end()) ? it->second : "";
+
+        return EditedFacts(useCode, bathrooms, bedrooms, totalRooms, yearBuilt, lotSizeSqFt,
+                           finishedSqFt, appliances, descriptions);
+    }
+
+    UpdatedPropertyDetails parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
+        NodeParser parser(rootNode);
+        auto const &data = parser.getData();       
+
+        HashTable::const_iterator it;
+        it = data.find("/zpid/");
+        assert(it != data.end());
+        IDType zpid = std::stoul(it->second);
+
+        it = data.find("/pageViewCount/currentMonth/");
+        int currentMonthCount = (it != data.end()) ? std::stoi(it->second) : 0;
+
+        it = data.find("/pageViewCount/total/");
+        int totalCount = (it != data.end()) ? std::stoi(it->second) : 0;
+
+        return UpdatedPropertyDetails(zpid, PageViewCount{{currentMonthCount, totalCount}},
+                                      parseAddress(data), parseEditedFacts(data));
+    }
 }
 
 #endif

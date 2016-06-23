@@ -45,10 +45,9 @@ namespace zillow {
         EdgeData(const EdgeData &data)
             : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
 
-        EdgeData(EdgeData &&data)
-            : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
+        EdgeData(EdgeData &&data) : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
 
-        EdgeData & operator=(EdgeData rhs) {
+        EdgeData &operator=(EdgeData rhs) {
             std::swap(SrcID, rhs.SrcID);
             std::swap(DstID, rhs.DstID);
             std::swap(Score, rhs.Score);
@@ -62,8 +61,9 @@ namespace zillow {
     };
 
     struct Address {
-        explicit Address(const std::string &street, const std::string &zipcode, const std::string &city,
-                         const std::string &state, const Real latitude, const Real longitude)
+        explicit Address(const std::string &street, const std::string &zipcode,
+                         const std::string &city, const std::string &state, const Real latitude,
+                         const Real longitude)
             : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
               Longitude(longitude) {}
 
@@ -261,9 +261,17 @@ namespace zillow {
         int TotalRooms;
         Real LotSizeSqFt;
         Real FinishedSqFt;
-        Real YearBuilt;
+        int YearBuilt;
         std::string Appliances;
         std::string HomeDescriptions;
+
+        explicit EditedFacts(const std::string &useCode, const Real bathrooms,
+                             const int bedrooms, const int totalRooms, const Real lotSizeSqFt,
+                             const Real finishedSqFt, const int yearBuilt,
+                             const std::string &appliances, const std::string &descriptions)
+            : UseCode(useCode), Bathrooms(bathrooms), Bedrooms(bedrooms),
+              TotalRooms(totalRooms), LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt),
+              YearBuilt(yearBuilt), Appliances(appliances), HomeDescriptions(descriptions) {}
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("UseCode", UseCode), cereal::make_nvp("Bathrooms", Bathrooms),
@@ -282,6 +290,17 @@ namespace zillow {
         PageViewCount pageViewCount;
         Address address;
         EditedFacts editedFacts;
+
+        explicit UpdatedPropertyDetails(const IDType id, const PageViewCount &count,
+                                        const Address &anAddress, const EditedFacts &facts)
+            : zpid(id), pageViewCount(count), address(anAddress), editedFacts(facts) {}
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("zpid", zpid), 
+               cereal::make_nvp("pageView", pageViewCount),
+               cereal::make_nvp("address", address),
+               cereal::make_nvp("editedFacts", editedFacts));
+        }
     };
 }
 

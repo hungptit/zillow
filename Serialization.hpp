@@ -48,6 +48,15 @@ namespace zillow {
         fmt::print("{}\n", output.str());
     }
 
+    template <typename OArchive> void print(const UpdatedPropertyDetails &info) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Updated property details", info));
+        }
+        fmt::print("{}\n", output.str());
+    }
+
     template <typename OArchive> void print(const std::vector<EdgeData> &data) {
         std::ostringstream output;
         {
@@ -71,6 +80,15 @@ namespace zillow {
         {
             OArchive oar(output);
             oar(cereal::make_nvp("Address", info));
+        }
+        fmt::print("{}\n", output.str());
+    }
+
+    template <typename OArchive> void print(const HashTable &info) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Hash table", info));
         }
         fmt::print("{}\n", output.str());
     }
