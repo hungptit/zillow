@@ -95,7 +95,7 @@ namespace zillow {
             // (zpid, Street, ZipCode, City, State, Latitude, Longitude,
             // UseCode, YearBuilt, LotSizeSqFt, FinishedSqFt, Bathrooms,
             // Bedrooms, TotalRooms)
-            using Row = Poco::Tuple<IDType, std::string, std::string, std::string, std::string,
+            using Row = Poco::Tuple<index_type, std::string, std::string, std::string, std::string,
                                     Real, Real, std::string, int, Real, Real, Real, int, int>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
@@ -123,7 +123,7 @@ namespace zillow {
             Statement insert(session);
 
             // Get an std::vector of Poco::Tuple
-            using Row = Poco::Tuple<IDType, std::string, Real, std::string>;
+            using Row = Poco::Tuple<index_type, std::string, Real, std::string>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
             for (auto const &item : vertexes) {
@@ -142,7 +142,7 @@ namespace zillow {
             Statement insert(session);
 
             // Get an std::vector of Poco::Tuple
-            using Row = Poco::Tuple<IDType, Real, Real, Real, std::string, std::string>;
+            using Row = Poco::Tuple<index_type, Real, Real, Real, std::string, std::string>;
             std::vector<Row> data;
             data.reserve(edges.size());
             for (auto const &item : vertexes) {
@@ -159,7 +159,7 @@ namespace zillow {
         // Update Tax table
         {
             fmt::print("Update Tax table\n");
-            using Row = Poco::Tuple<IDType, int, double>;
+            using Row = Poco::Tuple<index_type, int, double>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
             for (auto const &item : vertexes) {
@@ -177,11 +177,11 @@ namespace zillow {
         // Update Edges table
         {
             fmt::print("Update Edges table\n");
-            using Row = Poco::Tuple<IDType, IDType, double>;
+            using Row = Poco::Tuple<index_type, index_type, double>;
             std::vector<Row> data;
             data.reserve(edges.size());
             for (auto const &item : edges) {
-                data.emplace_back(Row(item.SrcID, item.DstID, item.Score));
+                data.emplace_back(Row(item.SrcID, item.DstID, item.Weight));
             }
 
             // Insert edge information into the Edges table
@@ -193,7 +193,7 @@ namespace zillow {
         // Update Links table
         {
             fmt::print("Create Links table\n");
-            using Row = Poco::Tuple<IDType, std::string, std::string, std::string, std::string>;
+            using Row = Poco::Tuple<index_type, std::string, std::string, std::string, std::string>;
             std::vector<Row> data;
             data.reserve(vertexes.size());
             for (auto const &item : vertexes) {

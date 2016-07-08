@@ -9,9 +9,9 @@ namespace std {
         typedef zillow::EdgeData argument_type;
         typedef std::size_t result_type;
         result_type operator()(const argument_type &aKey) const {
-            result_type const h1(std::hash<zillow::IDType>()(aKey.SrcID));
-            result_type const h2(std::hash<zillow::IDType>()(aKey.DstID));
-            result_type const h3(std::hash<zillow::IDType>()(aKey.Score));
+            result_type const h1(std::hash<zillow::index_type>()(aKey.SrcID));
+            result_type const h2(std::hash<zillow::index_type>()(aKey.DstID));
+            result_type const h3(std::hash<zillow::index_type>()(aKey.Weight));
             return h1 ^ (h2 << 1) ^ (h3 << 2);
         }
     };

@@ -24,9 +24,7 @@ int main(int argc, char **argv) {
     p.add("zpid", -1);
 
     po::variables_map vm;
-    po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(p).run(),
-        vm);
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     po::notify(vm);
 
     // Parse input arguments
@@ -56,22 +54,41 @@ int main(int argc, char **argv) {
     }
 
     std::string queryCmd = zillow::generateDeepCompsQuery(zwpid, zpid, count);
-    
+
     if (verbose) {
         fmt::print("Query link: {}\n", queryCmd);
     }
     std::stringstream output;
-    auto results = zillow::query(queryCmd, output);
+    auto queryResults = zillow::query(queryCmd, output);
 
     if (vm.count("output-to-xml")) {
-      zillow::writeTextFile(output, "deepCompsResults.xml");
+        zillow::writeTextFile(output, "deepCompsResults.xml");
     }
-    
-    if (results) {        
+
+    if (verbose) {
         fmt::print("{}\n", output.str());
-    } else {
+    }
+
+    if (!queryResults) {
         fmt::print("Could query this link: {}\n", queryCmd);
     }
 
+    // Parse the query results.
+    pugi::xml_document doc;
+    pugi::xml_parse_result parseResults = doc.load(output);
+    if (!parseResults) {
+        fmt::print("status: {}\n", parseResults.status);
+        fmt::print("description: {}\n", parseResults.description());
+    }
+
+    auto response = zillow::parseDeepCompsResponse(
+        doc.child("Comps:comps").child("response").child("properties"));
+
+    // Display all comparable homes
+    zillow::print<cereal::JSONOutputArchive>(std::get<0>(response));
+
+    // Display edge information.
+    // zillow::print<cereal::JSONOutputArchive>(std::get<1>(response));
+    
     return 0;
 }

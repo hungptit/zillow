@@ -27,3 +27,5 @@
 ** Can comunicate with the client -> get seed and some special commands such as update date for a given town.
 ** Can crawl data for a given town (limit the solution space -> save query count).
 * TODO Creae a list of email that can be used to query data from zillow. For example zillow-needham, zillow-springfield, zillow-enfield. The web crawler will be executed automatically to crawl latest from for these databases.
+* TODO Use spdlog to log all output information.
+* TODO 

@@ -30,33 +30,33 @@
 #include "cereal/types/vector.hpp"
 
 namespace zillow {
-    using IDType = unsigned int;
+    using index_type = unsigned int;
     using Real = double;
     using HashTable = std::unordered_map<std::string, std::string>;
 
     struct EdgeData {
-        explicit EdgeData(const IDType srcId, const IDType dstId, Real score)
-            : SrcID(srcId), DstID(dstId), Score(score) {}
+        explicit EdgeData(const index_type srcId, const index_type dstId, Real score)
+            : SrcID(srcId), DstID(dstId), Weight(score) {}
 
-        IDType SrcID;
-        IDType DstID;
-        Real Score;
+        index_type SrcID;
+        index_type DstID;
+        Real Weight;
 
         EdgeData(const EdgeData &data)
-            : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
+            : SrcID(data.SrcID), DstID(data.DstID), Weight(data.Weight){};
 
-        EdgeData(EdgeData &&data) : SrcID(data.SrcID), DstID(data.DstID), Score(data.Score){};
+        EdgeData(EdgeData &&data) : SrcID(data.SrcID), DstID(data.DstID), Weight(data.Weight){};
 
         EdgeData &operator=(EdgeData rhs) {
             std::swap(SrcID, rhs.SrcID);
             std::swap(DstID, rhs.DstID);
-            std::swap(Score, rhs.Score);
+            std::swap(Weight, rhs.Weight);
             return *this;
         }
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("srcid", SrcID), cereal::make_nvp("dstid", DstID),
-               cereal::make_nvp("score", Score));
+               cereal::make_nvp("weight", Weight));
         }
     };
 
@@ -252,7 +252,18 @@ namespace zillow {
         }
     };
 
-    using PageViewCount = std::array<int, 2>;
+    struct PageViewCount {
+        int CurrentMonth;
+        int Total;
+
+        explicit PageViewCount(const int currentMonth, const int total)
+            : CurrentMonth(currentMonth), Total(total) {}
+
+        template <typename Archive> void serialize(Archive &ar) {
+            ar(cereal::make_nvp("currentMonth", CurrentMonth),
+               cereal::make_nvp("total", Total));
+        }
+    };
 
     struct EditedFacts {
         std::string UseCode;
@@ -286,18 +297,17 @@ namespace zillow {
     };
 
     struct UpdatedPropertyDetails {
-        IDType zpid;
+        index_type zpid;
         PageViewCount pageViewCount;
         Address address;
         EditedFacts editedFacts;
 
-        explicit UpdatedPropertyDetails(const IDType id, const PageViewCount &count,
+        explicit UpdatedPropertyDetails(const index_type id, const PageViewCount &count,
                                         const Address &anAddress, const EditedFacts &facts)
             : zpid(id), pageViewCount(count), address(anAddress), editedFacts(facts) {}
 
         template <typename Archive> void serialize(Archive &ar) {
-            ar(cereal::make_nvp("zpid", zpid), 
-               cereal::make_nvp("pageView", pageViewCount),
+            ar(cereal::make_nvp("zpid", zpid), cereal::make_nvp("pageView", pageViewCount),
                cereal::make_nvp("address", address),
                cereal::make_nvp("editedFacts", editedFacts));
         }

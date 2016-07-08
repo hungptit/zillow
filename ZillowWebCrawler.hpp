@@ -13,9 +13,9 @@
 
 #include "Database.hpp"
 #include "Serialization.hpp"
+#include "Utils.hpp"
 #include "XMLParser.hpp"
 #include "Zillow.hpp"
-#include "Utils.hpp"
 
 #include "utils/LevelDBIO.hpp"
 
@@ -58,15 +58,13 @@ namespace zillow {
     class Crawler {
       public:
         explicit Crawler(const std::string &userid, const size_t num)
-            : NumberOfQueries(0), Vertexes(), Edges(), Visited(), Processed(), Queue(),
-              HouseIDs(), zwpid(userid), Database("database"), max_houses(num),
-              NoSQLWriter(Database) {}
+            : MaxHouse(num), Vertexes(), Edges(), Visited(), Processed(), Queue(), HouseIDs(),
+              zwpid(userid), Database("database"), NoSQLWriter(Database) {}
 
         explicit Crawler(const std::string &userid, const size_t num,
                          const std::string &dataFile)
-            : NumberOfQueries(0), Vertexes(), Edges(), Visited(), Processed(), Queue(),
-              HouseIDs(), zwpid(userid), Database(dataFile), max_houses(num),
-              NoSQLWriter(Database) {}
+            : MaxHouse(num), Vertexes(), Edges(), Visited(), Processed(), Queue(), HouseIDs(),
+              zwpid(userid), Database(dataFile), NoSQLWriter(Database) {}
 
         template <typename Constraints>
         void exec(const Address &aHouse, const int count, Constraints &cons) {
@@ -74,7 +72,7 @@ namespace zillow {
             std::string queryCmd = generateDeepSearchQuery(zwpid, aHouse);
             std::stringstream output;
             bool status = zillow::query(queryCmd, output);
-            ++NumberOfQueries;
+
             if (!status) {
                 fmt::print("Cannot query this link: {}", queryCmd);
                 return;
@@ -142,9 +140,8 @@ namespace zillow {
         // Will need to use BFS traversal.
         template <typename Constraints> void traverse(int count, Constraints &cons) {
             bool needToStop = false;
-            while (!Queue.empty() && (NumberOfQueries < 900) &&
-                   (Vertexes.size() < max_houses) && !needToStop) {
-                const unsigned long zpid = Queue.front();
+            while (!Queue.empty() && (Vertexes.size() < MaxHouse) && !needToStop) {
+                const index_type zpid = Queue.front();
                 Queue.pop_front();
 
                 // Debug message
@@ -170,7 +167,7 @@ namespace zillow {
 
                 pugi::xml_document doc;
                 pugi::xml_parse_result parseResults = doc.load(output);
-             
+
                 if (parseResults) {
                     fmt::print("status: {}\n", parseResults.status);
                     fmt::print("description: {}\n", parseResults.description());
@@ -233,16 +230,15 @@ namespace zillow {
         }
 
       private:
-        size_t NumberOfQueries;
+        size_t MaxHouse;
         std::vector<DeepSearchResults> Vertexes;
         std::vector<EdgeData> Edges;
-        std::unordered_set<unsigned long> Visited;
-        std::unordered_set<unsigned long> Processed;
-        std::deque<unsigned long> Queue;
-        std::unordered_set<IDType> HouseIDs;
+        std::unordered_set<index_type> Visited;
+        std::unordered_set<index_type> Processed;
+        std::deque<index_type> Queue;
+        std::unordered_set<index_type> HouseIDs;
         std::string zwpid;
         std::string Database;
-        size_t max_houses;
         utils::Writer NoSQLWriter;
     };
 }

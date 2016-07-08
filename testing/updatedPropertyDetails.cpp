@@ -22,9 +22,7 @@ int main(int argc, char **argv) {
     p.add("zpid", -1);
 
     po::variables_map vm;
-    po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(p).run(),
-        vm);
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     po::notify(vm);
 
     // Parse input arguments
@@ -54,12 +52,27 @@ int main(int argc, char **argv) {
     }
 
     std::stringstream output;
-    auto results = zillow::query(queryCmd, output);
-    if (results) {
-        fmt::print("{}\n", output.str());
-    } else {
-        fmt::print("Could query this link: {}\n", queryCmd);
+    auto status = zillow::query(queryCmd, output);
+    if (!status) {
+        fmt::print("Could not query this link: {}\n", queryCmd);
+        return 1;
     }
+
+    if (verbose) {
+        fmt::print("{}\n", output.str());
+    }
+
+    // Parse the query results.
+    pugi::xml_document doc;
+    pugi::xml_parse_result parseResults = doc.load(output);
+    if (!parseResults) {
+        fmt::print("status: {}\n", parseResults.status);
+        fmt::print("description: {}\n", parseResults.description());
+    }
+
+    auto response = zillow::parseUpdatedPropertyDetails(
+        doc.child("UpdatedPropertyDetails:updatedPropertyDetails").child("response"));
+    zillow::print<cereal::JSONOutputArchive>(response);
 
     return 0;
 }

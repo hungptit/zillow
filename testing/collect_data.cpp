@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
         return false;
     }
 
-    size_t max_houses = 100;
+    size_t max_houses = 2000;
     if (vm.count("max-house")) {
         max_houses = vm["max-house"].as<size_t>();
     }
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     }
 
     std::string zwpid =
-        (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID2;
+        (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID1;
     // if (vm.count("zwpid")) {
     //     zwpid = vm["zwpid"].as<std::string>();
     // }

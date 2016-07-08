@@ -23,7 +23,7 @@ namespace zillow {
         size_t len = 0;
         size_t idx = 0;
 
-        // Detect R: pattern
+        // Detect "R:" pattern
         for (; idx < stop; ++idx) {
             if (aComment[idx] == 'R') {
                 ++idx;
@@ -34,7 +34,7 @@ namespace zillow {
             }
         }
 
-        // Detect B: pattern
+        // Detect "B:" pattern
         for (; idx < N; ++idx) {
             if (aComment[idx] == 'B') {
                 ++idx;
@@ -348,7 +348,7 @@ namespace zillow {
         it = data.find("/editedFacts/bedrooms/");
         int bedrooms = (it != data.end()) ? std::stod(it->second) : 0;
 
-        it = data.find("/editedFacts/yeearBuilt/");
+        it = data.find("/editedFacts/yearBuilt/");
         int yearBuilt = (it != data.end()) ? std::stod(it->second) : 1900;
 
         it = data.find("/editedFacts/lotSizeSqFt/");
@@ -366,8 +366,8 @@ namespace zillow {
         it = data.find("/homeDescription/");
         std::string descriptions = (it != data.end()) ? it->second : "";
 
-        return EditedFacts(useCode, bathrooms, bedrooms, totalRooms, yearBuilt, lotSizeSqFt,
-                           finishedSqFt, appliances, descriptions);
+        return EditedFacts(useCode, bathrooms, bedrooms, totalRooms, lotSizeSqFt,
+                           finishedSqFt, yearBuilt, appliances, descriptions);
     }
 
     UpdatedPropertyDetails parseUpdatedPropertyDetails(pugi::xml_node rootNode) {
@@ -377,7 +377,7 @@ namespace zillow {
         HashTable::const_iterator it;
         it = data.find("/zpid/");
         assert(it != data.end());
-        IDType zpid = std::stoul(it->second);
+        index_type zpid = std::stoul(it->second);
 
         it = data.find("/pageViewCount/currentMonth/");
         int currentMonthCount = (it != data.end()) ? std::stoi(it->second) : 0;
@@ -385,7 +385,7 @@ namespace zillow {
         it = data.find("/pageViewCount/total/");
         int totalCount = (it != data.end()) ? std::stoi(it->second) : 0;
 
-        return UpdatedPropertyDetails(zpid, PageViewCount{{currentMonthCount, totalCount}},
+        return UpdatedPropertyDetails(zpid, PageViewCount{currentMonthCount, totalCount},
                                       parseAddress(data), parseEditedFacts(data));
     }
 }

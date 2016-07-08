@@ -40,9 +40,10 @@ TEST(parseUpdatedPropertyDetailsResults, Positive) {
     zillow::print<cereal::JSONOutputArchive>(response);
     EXPECT_TRUE(response.zpid == 57477487);
 
-    zillow::PageViewCount expectedCount{{3191, 4191}};
-    EXPECT_EQ(response.pageViewCount, expectedCount);
-
+    zillow::PageViewCount expectedCount(3191, 4191);
+    EXPECT_EQ(response.pageViewCount.CurrentMonth, 3191);
+    EXPECT_EQ(response.pageViewCount.Total, 4191);
+    
     std::string expectedAppliances(
         "Dryer, Dishwasher, Refrigerator, Range / Oven, Garbage disposal, Washer");
     EXPECT_EQ(response.editedFacts.Appliances, expectedAppliances);
@@ -97,7 +98,7 @@ TEST(parseDeepCompsResults, Positive) {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults = doc.load_file("deepCompsResults.xml");
 
-    if (parseResults) {
+    if (!parseResults) {
         fmt::print("status: {}\n", parseResults.status);
         fmt::print("description: {}\n", parseResults.description());
     }
