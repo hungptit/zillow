@@ -27,5 +27,27 @@
 ** Can comunicate with the client -> get seed and some special commands such as update date for a given town.
 ** Can crawl data for a given town (limit the solution space -> save query count).
 * TODO Creae a list of email that can be used to query data from zillow. For example zillow-needham, zillow-springfield, zillow-enfield. The web crawler will be executed automatically to crawl latest from for these databases.
+<<<<<<< HEAD
 * TODO Use spdlog to log all output information.
 * TODO 
+=======
+* Updated design
+** NoSQL database will have all information about crawled data.
+*** How to save or backup old data? Have a separate database for old data. If the new data in comming then
+**** Save old data to the old database.
+**** Override the old data with new data.
+** SQLite database only have the updated database and it is modified frequently?
+** Main thread will
+*** Crawl the data using DeepComps
+*** Update house information using UpdatedPropertyDetails
+*** Update house information using DeepSearchResults
+*** Save data to SQLite database.
+*** Save data to NoSQL database
+**** zpid_info: Information about this house.
+**** zpid_detail: Detail information.
+**** zpid_edges: Edges
+*** Save crawled data to NoSQL database
+**** zpid_DeepComp_date
+**** zpid_DeepSearch_date
+**** zpid_UpdatedDetails_date
+>>>>>>> 71d5d50256a9943ec00277842f5f236650a61012
