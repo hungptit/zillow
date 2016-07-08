@@ -25,6 +25,8 @@
 #include <sstream>
 #include <string>
 
+#include "utils/TemporaryDirectory.hpp"
+
 TEST(parseUpdatedPropertyDetailsResults, Positive) {
     pugi::xml_document doc;
     pugi::xml_parse_result parseResults =
@@ -123,13 +125,8 @@ TEST(parseDeepCompsResults, Positive) {
     EXPECT_TRUE(deepComps.size() == 25);
     EXPECT_TRUE(edges.size() == 25);
 
-    // Write information to the database
-    std::string dataFile("test_database.db");
-    
-    boost::filesystem::path aPath(dataFile);
-    if (boost::filesystem::exists(aPath)) {
-        boost::filesystem::remove(aPath);
-    }
-    
-    zillow::writeToSQLite(dataFile, deepComps, edges);
+    // Write information to the database      
+    utils::TemporaryDirectory tmpDir;
+    boost::filesystem::path aPath = tmpDir.getPath() / boost::filesystem::path("test_database.db");
+    zillow::writeToSQLite(aPath.string(), deepComps, edges);
 }
