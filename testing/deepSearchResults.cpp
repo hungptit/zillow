@@ -29,9 +29,7 @@ int main(int argc, char **argv) {
     p.add("street", -1);
 
     po::variables_map vm;
-    po::store(
-        po::command_line_parser(argc, argv).options(desc).positional(p).run(),
-        vm);
+    po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
     po::notify(vm);
 
     // Parse input arguments
@@ -69,9 +67,12 @@ int main(int argc, char **argv) {
     std::string zwpid = zillow::ZWSID::ID1;
     if (vm.count("zwpid")) {
         zwpid = vm["zwpid"].as<std::string>();
-    }   
+    }
 
-    std::string queryCmd = zillow::generateDeepSearchQuery(zwpid, zillow::Address(street, 0, city, state, 0.0, 0.0));
+    fmt::print("{}\n", zwpid);
+
+    std::string queryCmd = zillow::generateDeepSearchQuery(
+        zwpid, zillow::Address(street, "0", city, state, 0.0, 0.0));
     if (verbose) {
         fmt::print("Query link: {}\n", queryCmd);
     }
@@ -80,15 +81,15 @@ int main(int argc, char **argv) {
     bool status = zillow::query(queryCmd, output);
 
     if (vm.count("output-to-xml")) {
-      zillow::writeTextFile(output, "deepSearchResults.xml");
+        zillow::writeTextFile(output, "deepSearchResults.xml");
     }
-    
+
     if (!status) {
         fmt::print("Cannot query this link: {}", queryCmd);
     } else {
         pugi::xml_document doc;
         pugi::xml_parse_result parseResults = doc.load(output);
-        if (parseResults) {
+        if (!parseResults) {
             fmt::print("status: {}\n", parseResults.status);
             fmt::print("description: {}\n", parseResults.description());
         }
@@ -96,18 +97,16 @@ int main(int argc, char **argv) {
         {
             auto request = zillow::parseDeepSearchResultsRequest(
                 doc.child("SearchResults:searchresults").child("request"));
-            fmt::print("request: \n\taddress: {0}\n\tcitystatezip : {1}\n",
-                       std::get<0>(request), std::get<1>(request));
 
-            auto message = zillow::parseMessage(
-                doc.child("SearchResults:searchresults").child("message"));
+            auto message =
+                zillow::parseMessage(doc.child("SearchResults:searchresults").child("message"));
             zillow::print<cereal::JSONOutputArchive>(message);
 
-            auto response = zillow::parseDeepSearchResultsResponse(
-                doc.child("SearchResults:searchresults")
-                .child("response")
-                .child("results")
-                .child("result"));
+            auto response =
+                zillow::parseDeepSearchResultsResponse(doc.child("SearchResults:searchresults")
+                                                           .child("response")
+                                                           .child("results")
+                                                           .child("result"));
 
             zillow::print<cereal::JSONOutputArchive>(response);
         }

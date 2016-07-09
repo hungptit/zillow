@@ -84,6 +84,15 @@ namespace zillow {
         fmt::print("{}\n", output.str());
     }
 
+  template <typename OArchive> void print(const QueryRequest &qinfo) {
+        std::ostringstream output;
+        {
+            OArchive oar(output);
+            oar(cereal::make_nvp("Request", qinfo));
+        }
+        fmt::print("{}\n", output.str());
+    }
+
     template <typename OArchive> void print(const HashTable &info) {
         std::ostringstream output;
         {
