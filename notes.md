@@ -22,7 +22,7 @@
     * Use deep learning algorithms to improve the search results.
 
 ## Collect data automatically ##
-* Use one wspid for DeepSearchResults
+* Need three wspids for collecting data (DeepSearchResults, DeepComps, and UpdatedPropertyDetails)
 * Use one wspid for UpdatedPropertyDetails
 * Use more than one wspid for DeepComps
 * collect_data

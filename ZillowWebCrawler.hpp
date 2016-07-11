@@ -122,16 +122,6 @@ namespace zillow {
         }
 
         void save() const {
-            // Serialize all data to JSON
-            // std::stringstream output;
-            // {
-            //     cereal::JSONOutputArchive oar(output);
-            //     oar(cereal::make_nvp("Vertexes", Vertexes),
-            //         cereal::make_nvp("Edges", Edges));
-            // }
-            // writeTextFile(output, "crawled_data.json");
-
-            // Write to SQLite database
             fmt::print("Number of vertexes: {0}\n", Vertexes.size());
             fmt::print("Number of edges: {0}\n", Edges.size());
             writeToSQLite(Database + ".db", Vertexes, Edges);
@@ -182,7 +172,9 @@ namespace zillow {
                     // If we could not query data for a given address then skip
                     // it.
                     if (message.Code == 7) {
-                        // We have reach the maximum number of calls.
+                        // We have reach the maximum number of
+                        // calls. Need to wait for 24 hours then
+                        // resume the process.
                         needToStop = true;
                     }
                     continue;
@@ -201,9 +193,11 @@ namespace zillow {
                 Visited.insert(zpid);
 
                 // TODO: Use move to improve the performance.
-                for (auto &item : e) {
-                    Edges.emplace_back(item);
-                }
+                // for (auto &item : e) {
+                //     Edges.emplace_back(item);
+                // }
+
+                std::move(e.begin(), e.end(), Edges.end());
 
                 // Update house information
                 fmt::print("Update house information\n");
