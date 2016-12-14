@@ -44,7 +44,6 @@ include_directories ("${PROJECTS_FOLDER}/3p/gtest/include")
 include_directories ("${PROJECTS_FOLDER}/3p/fmt/include")
 include_directories ("${PROJECTS_FOLDER}/3p/leveldb/include")
 include_directories ("${PROJECTS_FOLDER}/3p/cereal/include")
-include_directories ("${PROJECTS_FOLDER}/3p/sparsehash/include/")
 include_directories ("${PROJECTS_FOLDER}/3p/pugixml/src")
 
 # Use POCO static library

@@ -270,7 +270,7 @@ namespace zillow {
     }
 
     bool validateData(const HashTable &data) {
-        bool isValid = ((data.size() > 30) && (data.size() < 44));
+        bool isValid = ((data.size() > 20) && (data.size() < 44));
         if (!isValid) {
             fmt::print("==============================\n");
             fmt::print("Number of elements: {}\n", data.size());
@@ -292,6 +292,7 @@ namespace zillow {
 
     DeepSearchResults extractData(const HashTable &data) {
         // Make sure that our code is in sync with the latest results.
+      // TODO: Need to make validateData more robust.
         assert(validateData(data));
 
         // Get zpid

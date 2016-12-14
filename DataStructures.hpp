@@ -15,31 +15,21 @@
 #include "cereal/types/string.hpp"
 #include "cereal/types/vector.hpp"
 
-
 namespace zillow {
     using index_type = unsigned int;
     using Real = double;
     using HashTable = std::unordered_map<std::string, std::string>;
 
     struct EdgeData {
-        explicit EdgeData(const index_type srcId, const index_type dstId, Real score)
-            : SrcID(srcId), DstID(dstId), Weight(score) {}
-
         index_type SrcID;
         index_type DstID;
         Real Weight;
 
-        EdgeData(const EdgeData &data)
-            : SrcID(data.SrcID), DstID(data.DstID), Weight(data.Weight){};
+        explicit EdgeData(const index_type srcId, const index_type dstId, Real score)
+            : SrcID(srcId), DstID(dstId), Weight(score) {}
 
-        EdgeData(EdgeData &&data) : SrcID(data.SrcID), DstID(data.DstID), Weight(data.Weight){};
-
-        EdgeData &operator=(EdgeData rhs) {
-            std::swap(SrcID, rhs.SrcID);
-            std::swap(DstID, rhs.DstID);
-            std::swap(Weight, rhs.Weight);
-            return *this;
-        }
+      template <typename T>
+      EdgeData(T &&data) : SrcID(data.SrcID), DstID(data.DstID), Weight(data.Weight){};
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("srcid", SrcID), cereal::make_nvp("dstid", DstID),
@@ -47,13 +37,23 @@ namespace zillow {
         }
     };
 
-    struct Address {
-        explicit Address(const std::string &street, const std::string &zipcode,
-                         const std::string &city, const std::string &state, const Real latitude,
-                         const Real longitude)
-            : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
-              Longitude(longitude) {}
+    // Define commonly used operator
+    bool operator==(const EdgeData &lhs, const EdgeData &rhs) {
+        return std::tie(lhs.SrcID, lhs.DstID, lhs.Weight) ==
+               std::tie(rhs.SrcID, rhs.DstID, rhs.Weight);
+    }
 
+    bool operator<(const EdgeData &lhs, const EdgeData &rhs) {
+        return std::tie(lhs.SrcID, lhs.DstID, lhs.Weight) <
+               std::tie(rhs.SrcID, rhs.DstID, rhs.Weight);
+    }
+
+    bool operator>(const EdgeData &lhs, const EdgeData &rhs) {
+        return std::tie(lhs.SrcID, lhs.DstID, lhs.Weight) >
+               std::tie(rhs.SrcID, rhs.DstID, rhs.Weight);
+    }
+
+    struct Address {
         std::string Street;
         std::string ZipCode;
         std::string City;
@@ -61,16 +61,20 @@ namespace zillow {
         Real Latitude;
         Real Longitude;
 
+        explicit Address(const std::string &street, const std::string &zipcode,
+                         const std::string &city, const std::string &state, const Real latitude,
+                         const Real longitude)
+            : Street(street), ZipCode(zipcode), City(city), State(state), Latitude(latitude),
+              Longitude(longitude) {}
+
         Address(const Address &data)
             : Street(data.Street), ZipCode(data.ZipCode), City(data.City), State(data.State),
               Latitude(data.Latitude), Longitude(data.Longitude) {}
 
-        Address(Address &&data) noexcept : Street(std::move(data.Street)),
-                                           ZipCode(data.ZipCode),
-                                           City(std::move(data.City)),
-                                           State(std::move(data.State)),
-                                           Latitude(data.Latitude),
-                                           Longitude(data.Longitude) {}
+        Address(Address &&data) noexcept
+            : Street(std::move(data.Street)), ZipCode(data.ZipCode), City(std::move(data.City)),
+              State(std::move(data.State)), Latitude(data.Latitude), Longitude(data.Longitude) {
+        }
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("street", Street), cereal::make_nvp("zipcode", ZipCode),
@@ -80,7 +84,28 @@ namespace zillow {
         }
     };
 
+    // Define commonly used operator for Address data structure.
+    bool operator==(const Address &lhs, const Address &rhs) {
+        return std::tie(lhs.Street, lhs.City, lhs.State, lhs.ZipCode) ==
+               std::tie(rhs.Street, rhs.City, rhs.State, rhs.ZipCode);
+    }
+
+    bool operator<(const Address &lhs, const Address &rhs) {
+        return std::tie(lhs.Street, lhs.City, lhs.State, lhs.ZipCode) <
+               std::tie(rhs.Street, rhs.City, rhs.State, rhs.ZipCode);
+    }
+
+    bool operator>(const Address &lhs, const Address &rhs) {
+        return std::tie(lhs.Street, lhs.City, lhs.State, lhs.ZipCode) >
+               std::tie(rhs.Street, rhs.City, rhs.State, rhs.ZipCode);
+    }
+
     struct Links {
+        std::string HomeDetails;
+        std::string GraphAndData;
+        std::string MapThisHome;
+        std::string Comparables;
+
         explicit Links(const std::string &homedetails, const std::string &graphanddata,
                        const std::string &mapthishome, const std::string &comparables)
             : HomeDetails(homedetails), GraphAndData(graphanddata), MapThisHome(mapthishome),
@@ -90,15 +115,11 @@ namespace zillow {
             : HomeDetails(data.HomeDetails), GraphAndData(data.GraphAndData),
               MapThisHome(data.MapThisHome), Comparables(data.Comparables) {}
 
-        Links(Links &&data) noexcept : HomeDetails(std::move(data.HomeDetails)),
-                                       GraphAndData(std::move(data.GraphAndData)),
-                                       MapThisHome(std::move(data.MapThisHome)),
-                                       Comparables(std::move(data.Comparables)) {}
-
-        std::string HomeDetails;
-        std::string GraphAndData;
-        std::string MapThisHome;
-        std::string Comparables;
+        Links(Links &&data) noexcept
+            : HomeDetails(std::move(data.HomeDetails)),
+              GraphAndData(std::move(data.GraphAndData)),
+              MapThisHome(std::move(data.MapThisHome)),
+              Comparables(std::move(data.Comparables)) {}
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("homedetails", HomeDetails),
@@ -130,12 +151,6 @@ namespace zillow {
     };
 
     struct HouseInfo {
-        explicit HouseInfo(const Address &address, const std::string &useCode,
-                           const int yearBuilt, Real lotSizeSqFt, Real finishedSqFt,
-                           Real bathrooms, int bedrooms, int totalRooms)
-            : HouseAddress(address), UseCode(useCode), YearBuilt(yearBuilt),
-              LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt), Bathrooms(bathrooms),
-              Bedrooms(bedrooms), TotalRooms(totalRooms) {}
         Address HouseAddress;
         std::string UseCode;
         int YearBuilt;
@@ -144,6 +159,13 @@ namespace zillow {
         Real Bathrooms;
         int Bedrooms;
         int TotalRooms;
+
+        explicit HouseInfo(const Address &address, const std::string &useCode,
+                           const int yearBuilt, Real lotSizeSqFt, Real finishedSqFt,
+                           Real bathrooms, int bedrooms, int totalRooms)
+            : HouseAddress(address), UseCode(useCode), YearBuilt(yearBuilt),
+              LotSizeSqFt(lotSizeSqFt), FinishedSqFt(finishedSqFt), Bathrooms(bathrooms),
+              Bedrooms(bedrooms), TotalRooms(totalRooms) {}
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("address", HouseAddress), cereal::make_nvp("useCode", UseCode),
@@ -156,11 +178,13 @@ namespace zillow {
     };
 
     struct TaxInfo {
+        int TaxAssessmentYear;
+        Real TaxAssessment;
+
+        // Default constructor which will assign the tax year to 1990 and assesment value to 0.0
         explicit TaxInfo() : TaxAssessmentYear(1990), TaxAssessment(0.0) {}
         explicit TaxInfo(const int year, const Real assessment)
             : TaxAssessmentYear(year), TaxAssessment(assessment) {}
-        int TaxAssessmentYear;
-        Real TaxAssessment;
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("taxAssessmentYear", TaxAssessmentYear),
@@ -169,15 +193,15 @@ namespace zillow {
     };
 
     struct SaleRecord {
+      std::string LastSoldDate;
+      double LastSoldPrice;
+      std::string Currency;
+      
         explicit SaleRecord()
             : LastSoldDate("01/01/1990"), LastSoldPrice(0.0), Currency("USD") {}
         explicit SaleRecord(const std::string &soldDate, const Real soldPrice,
                             const std::string &currency)
             : LastSoldDate(soldDate), LastSoldPrice(soldPrice), Currency(currency) {}
-
-        std::string LastSoldDate;
-        Real LastSoldPrice;
-        std::string Currency;
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("lastSoldDate", LastSoldDate),
@@ -199,9 +223,11 @@ namespace zillow {
     };
 
     struct Message {
-        explicit Message(const std::string &text, const int code) : Text(text), Code(code) {}
         std::string Text;
         int Code;
+
+        template <typename String>
+        Message(String &&text, const int code) : Text(std::forward<String>(text)), Code(code) {}
 
         template <typename Archive> void serialize(Archive &ar) {
             ar(cereal::make_nvp("Text", Text), cereal::make_nvp("Code", Code));

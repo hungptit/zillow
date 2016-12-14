@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     }
 
     std::string zwpid =
-        (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID1;
+        (vm.count("zwpid")) ? (vm["zwpid"].as<std::string>()) : zillow::ZWSID::ID2;
     // if (vm.count("zwpid")) {
     //     zwpid = vm["zwpid"].as<std::string>();
     // }

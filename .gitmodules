@@ -1,0 +1,9 @@
+[submodule "cereal"]
+	path = cereal
+	url = https://github.com/USCiLab/cereal
+[submodule "fmt"]
+	path = fmt
+	url = https://github.com/fmtlib/fmt
+[submodule "pugixml"]
+	path = pugixml
+	url = https://github.com/zeux/pugixml

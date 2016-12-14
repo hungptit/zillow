@@ -193,11 +193,11 @@ namespace zillow {
                 Visited.insert(zpid);
 
                 // TODO: Use move to improve the performance.
-                // for (auto &item : e) {
-                //     Edges.emplace_back(item);
-                // }
+                for (auto const &item : e) {
+                    Edges.emplace_back(item);
+                }
 
-                std::move(e.begin(), e.end(), Edges.end());
+                // std::move(e.begin(), e.end(), Edges.end());
 
                 // Update house information
                 fmt::print("Update house information\n");
