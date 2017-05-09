@@ -17,7 +17,7 @@
 #include "XMLParser.hpp"
 #include "Zillow.hpp"
 
-#include "utils/LevelDBIO.hpp"
+#include "sbutils/LevelDBIO.hpp"
 
 #include <deque>
 #include <fstream>
