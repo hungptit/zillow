@@ -22,7 +22,8 @@ git submodule init;
 git submodule update --recursive;
 
 # Build Boost libraries
-./bootstrap.sh --prefix=$BOOST_PREFIX --without-icu
+git clean -df
+./bootstrap.sh --prefix=$BOOST_PREFIX --without-icu --with-libraries=filesystem,regex,system
 ./b2 clean
 ./b2 headers
 ./b2 --build-dir=$TMPDIR/boost toolset=gcc stage

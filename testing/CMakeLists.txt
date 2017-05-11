@@ -66,9 +66,7 @@ ENABLE_TESTING()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Used libraries
-set(LIB_GTEST "${ROOT_DIR}/3p/gtest/lib/libgtest.a")
-set(LIB_GTEST_MAIN "${ROOT_DIR}/3p/gtest/lib/libgtest_main.a")
-set(LIB_LEVELDB "${ROOT_DIR}/3p/leveldb/out-static/libleveldb.a")
+set(LIB_ROCKSDB "${ROOT_DIR}/3p/rocksdb/librocksdb.a")
 
 # This option make sure that we use the local boost version. Note that if the 
 # system boost is installed then CMake might use that boost version.
@@ -82,12 +80,17 @@ if (Boost_NO_SYSTEM_PATHS)
   set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 endif (Boost_NO_SYSTEM_PATHS)
 
-find_package(Boost 1.60 REQUIRED date_time system filesystem thread graph program_options iostreams)
+find_package(Boost 1.60 REQUIRED date_time system filesystem iostreams)
+
+# A dirty fix for boost::program_options
+set(LIB_BOOST_PROGRAM_OPTIONS "${ROOT_DIR}/lib/libboost_program_options.a")
 
 # Include folders
 message(${ROOT_DIR})
 include_directories (${ROOT_DIR})
 include_directories ("${ROOT_DIR}/include")
+include_directories ("${ROOT_DIR}/3p/rocksdb/include")
+include_directories ("${ROOT_DIR}/graph")
 include_directories ("${ROOT_DIR}/sbutils")
 
 # Used libraries
@@ -98,6 +101,11 @@ set(LIB_POCO_SQLITE "${ROOT_DIR}/lib/libPocoDataSQLite.a")
 set(LIB_POCO_XML "${ROOT_DIR}/lib/libPocoXML.a")
 set(LIB_POCO_NET "${ROOT_DIR}/lib/libPocoNet.a")
 set(LIB_SNAPPY "${ROOT_DIR}/lib/libsnappy.a")
+set(LIB_LZ4 "${ROOT_DIR}/lib/liblz4.a")
+set(LIB_BZ2 "${ROOT_DIR}/lib/libbz2.a")
+set(LIB_JEMALLOC "${ROOT_DIR}/lib/libjemalloc.a")
+set(LIB_GTEST "${ROOT_DIR}/lib/libgtest.a")
+set(LIB_GTEST_MAIN "${ROOT_DIR}/lib/libgtest_main.a")
 
 if (Boost_FOUND)
   include_directories(${BOOST_INCLUDE_DIRS})  
@@ -105,10 +113,8 @@ if (Boost_FOUND)
   foreach (src_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${src_file} ${src_file}.cpp)
     TARGET_LINK_LIBRARIES(${src_file}
-      ${Boost_LIBRARIES}
-      ${LIB_LEVELDB}
-      ${LIB_FMT}
-      ${LIB_SNAPPY}  
+      ${Boost_LIBRARIES} ${LIB_BOOST_PROGRAM_OPTIONS}
+      ${LIB_ROCKSDB} ${LIB_SNAPPY} ${LIB_LZ4} ${LIB_BZ2} ${LIB_JEMALLOC}
       ${LIB_POCO_UTIL}
       ${LIB_POCO_NET}
       ${LIB_POCO_XML}
@@ -118,17 +124,15 @@ if (Boost_FOUND)
       ${LIB_POCO_SQLITE} -ldl -lpthread
       -lpthread -lrt)
   endforeach (src_file)
-  INSTALL_PROGRAMS(//$ENV{HOME}/Public/sbtools FILES ${COMMAND_SRC_FILES})
+  INSTALL_PROGRAMS(//$ENV{HOME}/bin/ FILES ${COMMAND_SRC_FILES})
 
   set(COMMAND_SRC_FILES tUnitTests tXML tSQLite)
   foreach (test_file ${COMMAND_SRC_FILES})
     ADD_EXECUTABLE(${test_file} ${test_file}.cpp)
     TARGET_LINK_LIBRARIES(${test_file}
       ${Boost_LIBRARIES}
-      ${LIB_LEVELDB}
-      ${LIB_FMT}
-      ${LIB_SNAPPY}  
-      ${LIB_GTEST} ${LIB_GTEST_MAIN}
+      ${LIB_ROCKSDB}  ${LIB_SNAPPY} ${LIB_LZ4} ${LIB_BZ2} ${LIB_JEMALLOC}
+      ${LIB_GTEST_MAIN} ${LIB_GTEST}
       ${LIB_POCO_UTIL}
       ${LIB_POCO_NET}
       ${LIB_POCO_XML}

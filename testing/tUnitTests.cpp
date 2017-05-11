@@ -6,8 +6,8 @@
 #include <tuple>
 #include <vector>
 
-#include "utils/TemporaryDirectory.hpp"
-#include "utils/Timer.hpp"
+#include "sbutils/TemporaryDirectory.hpp"
+#include "sbutils/Timer.hpp"
 
 #include "zillow/Constraints.hpp"
 #include "zillow/Hash.hpp"

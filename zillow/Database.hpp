@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "Zillow.hpp"
-#include "sbutils/LevelDBIO.hpp"
+#include "sbutils/RocksDB.hpp"
 
 #include "fmt/format.h"
 

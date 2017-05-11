@@ -23,4 +23,4 @@ $APKG_SRC/configure --prefix=$APKG_PREFIX $EXTRA_CONFIG_OPTIONS
 make $BUILD_OPTS $EXTRA_MAKE_OPTIONS
 make install
 popd;
-rm -rf $APKG_BUILD_FOLDER		# Cleanup build directory.
+#rm -rf $APKG_BUILD_FOLDER		# Cleanup build directory.

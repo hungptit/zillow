@@ -30,3 +30,14 @@
 	path = graph
 	url = https://github.com/hungptit/graph.git
 	branch = master
+[submodule "3p/snappy"]
+	path = 3p/snappy
+	url = https://github.com/google/snappy.git
+	branch = master
+[submodule "3p/lz4"]
+	path = 3p/lz4
+	url = https://github.com/lz4/lz4.git
+	branch = master
+[submodule "3p/jemalloc"]
+	path = 3p/jemalloc
+	url = https://github.com/jemalloc/jemalloc.git

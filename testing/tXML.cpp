@@ -25,7 +25,7 @@
 #include <sstream>
 #include <string>
 
-#include "utils/TemporaryDirectory.hpp"
+#include "sbutils/TemporaryDirectory.hpp"
 
 TEST(parseUpdatedPropertyDetailsResults, Positive) {
     pugi::xml_document doc;
@@ -127,7 +127,7 @@ TEST(parseDeepCompsResults, Positive) {
     EXPECT_TRUE(edges.size() == 25);
 
     // Write information to the database      
-    utils::TemporaryDirectory tmpDir;
+    sbutils::TemporaryDirectory tmpDir;
     boost::filesystem::path aPath = tmpDir.getPath() / boost::filesystem::path("test_database.db");
     zillow::writeToSQLite(aPath.string(), deepComps, edges);
 }
